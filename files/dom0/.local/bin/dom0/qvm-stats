@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# SPDX-FileCopyrightText: 2018 Chris Laprise <https://github.com/tasket>
+# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
+## System stats for Qubes dom0
+## Credits: https://github.com/tasket/Qubes-scripts
+set -eu
+
+delay=5
+sortcol=3
+sensor_lines='Package id 0|fan1|CPU'
+newline='
+'
+sumline="--------------------------------------------------------"
+header="\033[2K\nVM NAME                          STATE   CPU(%)   MEM(MB)"
+
+sensors_stats () {
+  sensors | grep -E "^($sensor_lines)"
+}
+
+trap "tput reset" HUP INT QUIT ABRT TERM EXIT
+
+tput reset
+sensors_stats
+echo -e "$header"
+cpusum=0; memsum=0; table="$sumline"
+# shellcheck disable=SC2016
+stdbuf -oL xentop -b -f -d "$delay" | \
+  stdbuf -oL awk '{printf ("%-32s %5s %5d   %7d\n", $1,$2,$4,$5/1000) }' | \
+  (
+    read -r ln
+    while true; do
+      if read -r -t 0.1 ln; then
+        table="$table$newline$ln"
+        read -r _ _ cpu mem <<<"$ln"
+        cpusum=$((cpusum+cpu))
+        memsum=$((memsum+mem))
+      else
+        # End of list, print totals, make new page.
+        sort -k $sortcol -n -r <<<"$table"
+        printf '%-32s %5s  %5d   %7d\033[J\033[H' " " " " "$cpusum" "$memsum"
+        read -r ln
+        cpusum=0; memsum=0
+        table="$sumline"
+        #clear
+        #sensors |grep -E "^($sensor_lines)"
+        sensors_stats
+        echo -e "\033[2K$header\n"
+      fi
+    done
+  )

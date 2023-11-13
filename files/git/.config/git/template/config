@@ -1,0 +1,16 @@
+; vim: ft=gitconfig
+; SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+;
+; SPDX-License-Identifier: AGPL-3.0-or-later
+
+[branch "main"]
+	merge = refs/heads/main
+	rebase = true
+	remote = origin
+[core]
+	bare = false
+	fileMode = true
+	logAllRefUpdates = true
+	repositoryFormatVersion = 0
+[init]
+	defaultBranch = main

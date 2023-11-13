@@ -1,0 +1,41 @@
+#!/bin/sh
+
+## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: AGPL-3.0-or-later
+
+set -eu
+
+# shellcheck disable=SC1090,SC1091
+. "${0%/*}"/.git-shell-lib
+
+usage(){
+  # shellcheck disable=2154
+  echo "usage: ${0##*/} SECTION REPOSITORY [DESCRIPTION]
+note: prints the current description if none description is specified.:w
+regex: $regex" >&2
+  exit 1
+}
+
+test -n "${2-}" || usage
+section="$1"
+test_name section "$section"
+repo="$2"
+test_name repo "$repo"
+clean_repo_name
+
+# shellcheck disable=SC2154
+is_bare "$base/$section/$repo"
+
+description_file="$base/$section/$repo/description"
+
+if test -z "${3-}"; then
+  test -f "$description_file" || touch "$description_file"
+  cat "$description_file"
+  exit 0
+fi
+
+description="$(echo "$3" | cut -c 1-80)"
+test_name description "$description"
+
+echo "$description" | tee "$description_file"

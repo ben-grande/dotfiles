@@ -1,0 +1,24 @@
+#!/bin/sh
+##
+## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: CC-BY-SA-3.0
+##
+## Credits: https://stackoverflow.com/a/44644933
+## From any file, get its current directory.
+## usage: get-script-dir $0
+set -eu
+test -n "${1-}" || exit 1
+
+prg="$1"
+if ! test -e "$prg"; then
+  case "$prg" in
+    (*/*) exit 1;;
+    (*) prg=$(command -v -- "$prg") || exit 1;;
+  esac
+fi
+dir="$(cd -P -- "$(dirname -- "$prg")" && pwd -P)" || exit 1
+prg="$dir/$(basename -- "$prg")" || exit 1
+printf '%s\n' "$dir"
+
+exit 0

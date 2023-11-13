@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+set -eu
+
+## Guarantee commands are run from $HOME
+cd
+
+# shellcheck disable=SC2034
+base="src"
+
+## Regex: can contain "A-Za-z0-9_.-" but must not start or end with "_.-".
+# shellcheck disable=SC2034
+regex="^[A-Za-z0-9]+([A-Za-z0-9_.-]+[A-Za-z0-9]+)?$"
+
+fail_invalid_name(){
+  echo "Error: invalid value for key: $1" >&2
+  exit 1
+}
+
+test_name(){
+  key="$1"
+  value="$2"
+  if ! (echo "$value" | grep -E -q "${regex}"); then
+    fail_invalid_name "$key"
+  fi
+}
+
+clean_repo_name(){
+  case "${repo-}" in
+    *.git) repo="";;
+    *) repo="$repo.git";;
+  esac
+}
+
+is_bare(){
+  repo="$1"
+  if ! test -d "$repo"; then
+    echo "Repository doesn't exist: $repo" >&2
+    return 1
+  fi
+  if ! test "$(git -C "$repo" rev-parse --is-bare-repository)" = "true"; then
+    echo "Repository is not bare: $repo" >&2
+    return 1
+  fi
+}

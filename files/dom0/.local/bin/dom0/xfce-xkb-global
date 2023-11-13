@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+## Make Xfce keyboard settings be applied globally, not per app or window.
+## Xfce doesn't let you configure the keyboard properly in one place, it uses
+## a separate plugin for some tasks.
+## https://docs.xfce.org/panel-plugins/xfce4-xkb-plugin/start
+## You can modify the plugin values by:
+## - editing the "panel" and adding "keyboard layouts" plugin. After adding
+##   the plugin, right click on it and edit its properties. Set "manage
+##   layout" to globally.
+## - editing the plugin directly in the "settings editor", search for plugin-n,
+##   where "n" is a number we don't know and its value is "kxb", search for
+##   group-policy and set it to "0".
+## - editing the plugin values via commandline with "xfconf" and set
+##   "group-policy" value to "0".
+set -eu
+
+xkb_plugin="$(xfconf-query -v -c xfce4-panel -p /plugins -l | grep xkb)"
+xfconf-query -c xfce4-panel -p "$xkb_plugin/group-policy" -n -s 0

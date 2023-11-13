@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+## qvm-backup only backs up home dir, therefore save other dirs to our home.
+set -eu
+
+source_dirs="
+/etc/qubes/policy.d
+"
+
+target_dir="/home/user/backup/$(date +%Y-%m-%d_%H-%M)"
+
+for dir in ${source_dirs}; do
+  mkdir -p "${target_dir}${dir}"
+  cp -a "${dir}"/* "${target_dir}/${dir}"
+done

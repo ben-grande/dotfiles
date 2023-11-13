@@ -1,0 +1,15 @@
+## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: AGPL-3.0-or-later
+
+## Source configuration
+cd ~/.config/mutt
+source ~/.muttrc-credentials.local
+source conf.d/server.muttrc
+source conf.d/mailbox.muttrc
+source conf.d/pgp.muttrc
+source conf.d/bindings.muttrc
+source conf.d/colors.muttrc
+source ~/.muttrc-aliases.local
+source ~/.muttrc.local
+## vim: ft=muttrc

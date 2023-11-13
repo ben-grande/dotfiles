@@ -1,0 +1,57 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+## Copy a file from an DomU to Dom0. Script has to be run in Dom0
+set -eu
+
+usage(){
+  echo "usage: ${0##*/} <QUBE> <FILE> <FILE2...>" >&2
+  exit 1
+}
+
+run_qube(){
+  qvm-run -p "${qube}" "${1}"
+}
+
+main(){
+  qube_file="${1}"
+  qube_dir="${qube_file%/*}"
+  qube_base="${qube_file##*/}"
+
+  incoming_dir="/home/user/QubesIncoming/${qube}"
+  mkdir -p -- "${incoming_dir}"
+  incoming_file="${incoming_dir}/${qube_base}"
+  incoming_base="${qube_base}"
+
+  if test -e "${incoming_file}"; then
+    echo "Error: destination already exists: ${incoming_file}" >&2
+    exit 1
+  fi
+
+  if ! run_qube "test -e ${qube_file}"; then
+    echo "Error: Qube ${qube} does not contain file ${qube_file}" >&2
+    exit 1
+  fi
+
+  if run_qube "test -d \"${qube_file}\""; then
+    run_qube "tar -cC \"${qube_dir}\" \"${qube_base}\" " \
+      | tar -xC "${incoming_dir}" "${incoming_base}"
+  else
+    run_qube "cat -- \"${qube_file}\"" > "${incoming_file}"
+  fi
+}
+
+
+test -n "${2-}" || usage
+qube="${1}"
+shift
+
+while true; do
+  main "${1}"
+  shift
+  test -z "${1-}" || continue
+  break
+done

@@ -1,0 +1,14 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: dotfiles
+Upstream-Contact: Benjamin Grande M. S .<ben.grande.b@gmail.com>
+Source: https://github.com/ben-grande/dotfiles
+
+Files: files/git/.config/git/message
+Copyright: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+License: MIT
+
+Files: files/sh/.config/less/lesskey-old
+Copyright: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+License: GPL-3.0-or-later
+
+# vim: ft=debcopyright

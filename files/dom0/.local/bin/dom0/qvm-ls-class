@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+set -eu
+
+case "${1-}" in
+  -A|--admin)
+    q_class="AdminVM"
+    ;;
+  -t|--template)
+    q_class="TemplateVM"
+    ;;
+  -a|--app)
+    q_class="AppVM"
+    ;;
+  -d|--disp)
+    q_class="DispVM"
+    ;;
+  -s|--standalone)
+    q_class="StandaloneVM"
+    ;;
+  "")
+    true
+    ;;
+  *)
+    printf '%s\n' "usage: ${0##*/} [CLASS]
+ -A, --admin
+ -t, --template
+ -a, --app
+ -d, --disp
+ -s, --standalone"
+    exit 1
+    ;;
+esac
+
+if test -z "${q_class-}"; then
+  qvm-ls --no-spinner --raw-list
+else
+  qvm-ls --no-spinner --raw-data --fields=NAME,CLASS | \
+    awk -v at="${q_class}" -F "|" '$2 ~ at {print $1}'
+fi

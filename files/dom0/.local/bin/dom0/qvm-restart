@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+set -eu
+
+test -n "${1:-}" || { echo "Usage: ${0##*/} QUBE [QUBE ...]"; exit 1; }
+
+vms="${*}"
+
+## exclude disposables
+vms_avail=""
+for vm in ${vms}; do
+  qvm-check "${vm}" >/dev/null 2>&1 && vms_avail="${vms_avail} ${vm}"
+done
+
+test -z "${vms_avail}" && exit 0
+
+# shellcheck disable=SC2086
+qvm-shutdown --wait --timeout 120 --force ${vms_avail}
+# shellcheck disable=SC2086
+qvm-start ${vms_avail}
+
+exit 0

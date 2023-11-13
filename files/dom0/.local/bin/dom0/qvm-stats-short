@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2018 one7two99 <https://github.com/one7two99>
+# SPDX-FileCopyrightText: 2018 Ivan <https://github.com/taradiddles>
+# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
+## Credits: https://github.com/Qubes-Community/Contents/blame/master/code/monitoring/ls-qubes.sh
+## Output: 9Q|13.3G -> 9 Qubes running with 13.3GB of total RAM consumption.
+## The output of this script can be placed in the Xfce top bar, via:
+##   1) Right Click on bar > Panel > Add new items > Generic Monitor > Add
+##   2) Right click on the newly added monitor and choose properties.
+##   3) Add this script to the command field.
+
+xl list | awk '
+  BEGIN { mem=0; qubes=0; } / [0-9]+ +[0-9]+ +[0-9]+ / { mem+=$3; qubes++; }
+  END { printf("%dQ|%.1fG\n", qubes, mem/1000); }'

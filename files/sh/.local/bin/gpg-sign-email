@@ -1,0 +1,47 @@
+#!/bin/sh
+##
+## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: AGPL-3.0-or-later
+##
+##
+## Git send-email and format-patch does not GPG sign the data.
+## This wrapper opens a patch with Vi, skip the first block (where the
+## headers hopefully are) and signs the remaining content of the file, which
+## is the mail body (cover letter and patch).
+##
+## == Workflow ==
+## Dev Qube:
+## $ git format-patch [OPTIONS]
+## $ cd /patches/dir/
+## $ vim *.patch                  # edit the cover letter
+## $ qvm-move *.patch             # move patches to the mail qube
+## $ cd -
+## Mail Qube:
+## $ cd ~/QubesIncoming/dev-qube/
+## # take a look at the files
+## $ gpg-sign-email *.patch.asc   # sign patches with the mail key
+## $ git send-email *.patch.asc
+
+set -eu
+
+if test -z "${1-}"; then
+  printf '%s\n' "usage: ${0##*/} [PATCH] [PATCH...]"
+  printf '%s\n' "example: ${0##*/} *.patch"
+  printf "info: signed files are saved with the suffix '.asc'\n"
+  exit 1
+fi
+
+vi_cmd="$(has -s vim vi)"
+if test -z "$vi_cmd"; then
+  printf '%s\n' "Please install 'vi(m)'."
+  exit 1
+fi
+
+for f in "${@}"; do
+  cp "$f" "$f.asc"
+  "$vi_cmd" -u NONE \
+    -c 'set nomodeline' -c 'norm gg}j' \
+    -c '.,$!gpgw -a --clear-sign' \
+    -c 'wq' -- "$f.asc"
+done

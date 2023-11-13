@@ -1,0 +1,36 @@
+#!/bin/sh
+
+## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: AGPL-3.0-or-later
+
+set -eu
+
+# shellcheck disable=SC1090,SC1091
+. "${0%/*}"/.git-shell-lib
+
+usage(){
+  # shellcheck disable=2154
+  echo "usage: ${0##*/} SECTION REPOSITORY [BRANCH]
+regex: $regex" >&2
+  exit 1
+}
+
+test -n "${2-}" || usage
+section="$1"
+test_name section "$section"
+repo="$2"
+test_name repo "$repo"
+clean_repo_name
+branch=""
+test -n "${3-}" && branch="$3"
+
+if test -n "${branch}"; then
+  test_name branch "$branch"
+fi
+
+# shellcheck disable=SC2154
+git init \
+  --bare \
+  ${branch:+--initial-branch $branch} \
+  -- "$base/$section/$repo"

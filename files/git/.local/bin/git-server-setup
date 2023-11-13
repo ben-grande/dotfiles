@@ -1,0 +1,45 @@
+#!/bin/sh
+
+## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: AGPL-3.0-or-later
+
+## Setup git server.
+set -eu
+
+if ! test "$(id -u)" = "0"; then
+  echo "This program requires root." >&2
+  exit 1
+fi
+
+if ! command -v git >/dev/null; then
+  printf '%s\n' "Missing dependency: git" >&2
+  exit 1
+fi
+if ! command -v git-shell >/dev/null; then
+  printf '%s\n' "Missing dependency: git-shell" >&2
+  exit 1
+fi
+
+git_user="git"
+git_home="/var/git"
+git_shell="$(command -v git-shell)"
+
+useradd -m "$git_user" -d "$git_home" -s "$git_shell"
+mkdir -p "$git_home/src"
+
+mkdir -p "$git_home/.ssh"
+chmod 0700 "$git_home/.ssh"
+touch "$git_home/.ssh/authorized_keys"
+chmod 0600 "$git_home/.ssh/authorized_keys"
+
+mkdir -p "$git_home/git-shell-commands"
+cp -r "$git_home/.config/git/shell"/* "$git_home/git-shell-commands"
+chmod -R 0755 "$git_home/git-shell-commands"
+
+git config --system receive.updateServerInfo true
+git config --system receive.advertisePushOptions true
+nonce="$(head /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' | head -c 256)"
+git config --system receive.certNonceSeed "$nonce"
+
+chown -R "$git_user":"$git_user" "$git_home"

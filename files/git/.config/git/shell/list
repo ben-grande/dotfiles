@@ -1,0 +1,47 @@
+#!/bin/sh
+
+## SPDX-FileCopyrightText: 2010 Greg Brockman <https://gregbrockman.com>
+## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: GPL-2.0-only
+
+## Credits: git/contrib/git-shell-commands/list
+
+set -eu
+
+# shellcheck disable=SC1090,SC1091
+. "${0%/*}"/.git-shell-lib
+
+usage(){
+  # shellcheck disable=2154
+  echo "usage: ${0##*/} [SECTION]
+regex: $regex" >&2
+  exit 1
+}
+
+section=""
+case "${1-}" in
+  -h|--help) usage;;
+  "") ;;
+  *) section="$1"; test_name section "$section";;
+esac
+
+# shellcheck disable=SC2154
+if ! test -d "$base/$section"; then
+  echo "Section doesn't exist: $section" >&2
+  exit 1
+fi
+
+# shellcheck disable=SC2016
+print_bare='
+  test "$(git -C "$1" rev-parse --is-bare-repository)" = true && printf "%s\n" "${1}"
+'
+
+# shellcheck disable=SC2154
+if test -n "$section"; then
+  find "$base/$section" -maxdepth 1 -type d -name "*.git" \
+    -exec sh -c "$print_bare" -- {} \; -prune 2>/dev/null || true
+else
+  find "$base" -maxdepth 2 -type d -name "*.git" \
+    -exec sh -c "$print_bare" -- {} \; -prune 2>/dev/null || true
+fi

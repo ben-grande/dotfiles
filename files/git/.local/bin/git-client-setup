@@ -1,0 +1,47 @@
+#!/bin/sh
+
+## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: AGPL-3.0-or-later
+
+## Setup git client on new machine on a local/separate git configuration.
+set -eu
+
+gitconfig_file="$HOME/.gitconfig.local"
+signature_file="$HOME/.signature"
+vim_modeline="vim: ft=gitconfig"
+
+usage(){
+  printf '%s\n' "usage: ${0##*/} USER EMAIL SIGNINGKEY" >&2
+}
+
+if ! command -v git >/dev/null; then
+  printf '%s\n' "Missing dependency: git" >&2
+  exit 1
+fi
+
+if test -z "${3-}"; then
+  usage
+  exit 1
+fi
+
+user="$1"
+email="$2"
+signingkey="$3"
+
+set_git_config(){
+  git config --file "$gitconfig_file" "$1" "$2"
+}
+
+set_git_config user.name "$user"
+set_git_config user.email "$email"
+set_git_config user.signingKey "$signingkey"
+
+if test -s "$signature_file"; then
+  set_git_config format.signatureFile "$signature_file"
+else
+  set_git_config format.signature "$user"
+fi
+
+grep -E "^;*\s+(vim:.*(\s+|:)|vim:(\s*))(ft|filetype)=gitconfig((\s+|:).*|$)" \
+  -q "$gitconfig_file" || sed -i'' "1i; $vim_modeline" "$gitconfig_file"

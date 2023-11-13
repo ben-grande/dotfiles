@@ -1,0 +1,204 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+## Force signature verification for everything that can be signed.
+## - signed pushes (if the server is configured to receive it);
+## - signed commits, unsigned commit can be validated by a signed tag pointing
+##   to the commit;
+## - signed tags.
+##
+## Enable signed pushes client side:
+## [push]
+##         gpgSign = if-asked
+##
+## Enable signed pushes server side:
+## [receive]
+##         advertisePushOptions = true
+##         certNonceSeed = "<random-string>"
+##
+## You may only want a set of keys to be able to sign the push and they might
+## different from the keys that are able to sign commit and tags.
+## Unfortunately git does not allow setting a different gpg home for this, you
+## have to point GIT_PUSH_CERT_PGPHOMEDIR to the desired keyring. It is
+## analogous to setting a GNUPGHOME but will take precedence over GNUPGHOME.
+##
+# shellcheck disable=SC2317
+set -eu
+
+command -v git >/dev/null || exit 1
+
+obj_rejected=""
+zero="$(git hash-object --stdin </dev/null | tr "0-9a-f" "0")"
+tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/XXXXXX")"
+trap 'rm -f "$tmpdir"' HUP INT QUIT ABRT TERM EXIT
+
+require_signed_push(){
+  if test -z "${GIT_PUSH_CERT-}"; then
+    echo "Pushes must be signed but client didn't sign it." >&2
+    exit 1
+  fi
+
+  check_signed_push
+}
+
+check_signed_push(){
+  if test -n "${GIT_PUSH_CERT_PGPHOMEDIR-}"; then
+    check_signed_push_keyring
+    return 0
+  fi
+
+  if test "${GIT_PUSH_CERT_STATUS}" = "G"; then
+    true "Certificate verification succeeded with key: ${GIT_PUSH_CERT_KEY}"
+  else
+    echo "Certificate verification failed with status: ${GIT_PUSH_CERT_STATUS}" >&2
+    echo "Certificate key: ${GIT_PUSH_CERT_KEY}" >&2
+    exit 1
+  fi
+
+  if test "${GIT_PUSH_CERT_NONCE_STATUS}" = "OK"; then
+    true "Certificate nonce verification succeeded with nonce: ${GIT_PUSH_CERT_NONCE}"
+  else
+    echo "Certificate nonce verification failed with status: ${GIT_PUSH_CERT_NONCE_STATUS}" >&2
+    exit 1
+  fi
+}
+
+check_signed_push_keyring(){
+  true "Using keyring to verify push certificate: ${GIT_PUSH_CERT_PGPHOMEDIR}"
+
+  gpg="$(git config --get gpg.program || echo "gpg")"
+  cert="$(git cat-file blob "${GIT_PUSH_CERT}")"
+  begin_sig="-----BEGIN PGP SIGNATURE-----"
+
+  cert_msg="$tmpdir"/cert.msg
+  cert_sig="$tmpdir"/cert.sig
+
+  in_sig=0
+  echo "$cert" | while read -r line; do
+    if test "$in_sig" = "1" || test "$line" = "$begin_sig"; then
+      in_sig=1
+      echo "$line" | tee -a "$cert_sig"
+    elif test "$line" != "$begin_sig"; then
+      echo "$line" | tee -a "$cert_msg"
+    else
+      break
+    fi
+  done
+
+  gpg_out="$("$gpg" --status-fd=1 --no-default-keyring \
+             --homedir "${GIT_PUSH_CERT_PGPHOMEDIR}" \
+             --verify "$cert_sig" "$cert_msg" 2>&1)"
+  gpg_ec="$?"
+  gpg_sig="$(echo "$gpg_out" | awk '/ GOODSIG /{print $3}')"
+  if test "$gpg_ec" = "0"; then
+    true "Certificate verification succeeded with key: $gpg_sig"
+  else
+    echo "Certificate verification failed. Verification output:" >&2
+    echo "$gpg_out" >&2
+  fi
+  rm -rf "$tmpdir"
+
+  if test "${GIT_PUSH_CERT_NONCE_STATUS}" = "OK"; then
+    true "Certificate nonce verification succeeded with nonce: ${GIT_PUSH_CERT_NONCE}"
+  else
+    echo "Certificate nonce verification failed with status: ${GIT_PUSH_CERT_NONCE_STATUS}" >&2
+    exit 1
+  fi
+}
+
+## Force signed pushes if receive.certNonceSeed is set.
+if git config --get receive.certNonceSeed >/dev/null 2>&1; then
+  require_signed_push
+fi
+
+while read -r oldrev newrev ref; do
+  true "$oldrev $newrev $ref"
+  test "$newrev" = "$zero" && continue
+
+  if test "$oldrev" = "$zero"; then
+    objects="$(git rev-list "$newrev")"
+  else
+    objects="$(git rev-list "$oldrev..$newrev")"
+  fi
+
+  obj_type="$(git cat-file -t "$newrev")"
+  if test "$obj_type" = "tag"; then
+    if git verify-tag "$newrev" >/dev/null 2>&1; then
+      true "Tag verification succeeded for tag: $newrev"
+    else
+      obj_rejected="${obj_rejected-} $newrev "
+      continue
+    fi
+    commit_tag="$(git rev-list -n1 "$newrev")"
+    obj_rejected="$(echo "$obj_rejected" | sed "s/ $commit_tag //")"
+    echo "Commit verification done by tag: $commit_tag $newrev" >&2
+    continue
+  fi
+
+  for obj in $objects; do
+
+    if git verify-commit "$obj" >/dev/null 2>&1; then
+      true "Commit verification succeeded commit: $obj"
+      continue
+    else
+      echo "No valid signature in commit: $obj" >&2
+      obj_rejected="${obj_rejected-} $obj "
+    fi
+
+  done
+done
+
+test -n "$obj_rejected" || exit 0
+
+obj_rejected="$(echo "$obj_rejected" | tr -s " " | sed -e "s/^ //" -e "s/ $//")"
+echo "Couldn't verify objects: $obj_rejected" >&2
+exit 1
+
+## Force signed pushes if receive.certNonceSeed is set.
+if git config --get receive.certNonceSeed >/dev/null 2>&1; then
+  require_signed_push
+fi
+
+while read -r oldrev newrev ref; do
+  true "$oldrev $newrev $ref"
+  test "$newrev" = "$zero" && continue
+
+  if test "$oldrev" = "$zero"; then
+    objects="$(git rev-list "$newrev")"
+  else
+    objects="$(git rev-list "$oldrev..$newrev")"
+  fi
+
+  obj_type="$(git cat-file -t "$newrev")"
+  if test "$obj_type" = "tag"; then
+    if git verify-tag "$newrev" >/dev/null 2>&1; then
+      true "Tag verification succeeded for tag: $newrev"
+    else
+      obj_rejected="${obj_rejected-} $newrev "
+      continue
+    fi
+    commit_tag="$(git rev-list -n1 "$newrev")"
+    obj_rejected="$(echo "$obj_rejected" | sed "s/ $commit_tag //")"
+    echo "Commit verification done by tag: $commit_tag $newrev" >&2
+    continue
+  fi
+
+  for obj in $objects; do
+    if git verify-commit "$obj" >/dev/null 2>&1; then
+      true "Commit verification succeeded commit: $obj"
+      continue
+    else
+      echo "No valid signature in commit: $obj" >&2
+      obj_rejected="${obj_rejected-} $obj "
+    fi
+  done
+done
+
+test -n "$obj_rejected" || exit 0
+
+obj_rejected="$(echo "$obj_rejected" | tr -s " " | sed -e "s/^ //" -e "s/ $//")"
+echo "Couldn't verify objects: $obj_rejected" >&2
+exit 1
