@@ -36,6 +36,6 @@ if test -z "${3-}"; then
 fi
 
 description="$(echo "$3" | cut -c 1-80)"
-test_name description "$description"
+test_description description "$description"
 
 echo "$description" | tee "$description_file"
