@@ -10,177 +10,180 @@
 ## - https://www.mail-archive.com/qubes-users@googlegroups.com/msg20088.html
 ## - https://github.com/taradiddles/qubes-os-qvm-bash-completion
 
+# ---------------------------------------------------------------------------
+# COMP_CWORD related functions
 
-## COMPLETION FUNCTIONS
-## ====================
-## Output the relative position of COMP_CWORD with option words ignored
-## Note: This logic is flawed when using option arguments (eg. -s blah).
-##       Unfortunately there is no way to solve this except parsing every
-##       known option for a given qvm-* command
-_get-cword() {
+# Get the relative position of COMP_CWORD with option words ignored
+# Note: This logic is flawed when using option arguments (eg. -s blah).
+#       Unfortunately there is no way to solve this except parsing every
+#       known option for a given qvm-* command
+_get-cword-pos() {
   local index=0
   local i
   for ((i=1; i<=COMP_CWORD; i++)); do
     [[ ${COMP_WORDS[i]} == -* ]] && continue
-    let index++
+    ((index++))
   done
   echo ${index}
 }
 
-# Output the relative position of COMP_CWORD with option words ignored
-# Note: This logic is flawed when using option arguments (eg. -s blah).
-#       Unfortunately there is no way to solve this except parsing every
-#       known option for a given qvm-* command
-_get-first-word() {
+# Get the relative position of the first COMP_CWORD with option words ignored
+# Note: Same limitation as _get-cword-pos() above.
+_get-first-cword() {
   local i
   for ((i=1; i<=COMP_CWORD; i++)); do
     [[ ${COMP_WORDS[i]} == -* ]] && continue
-    echo ${COMP_WORDS[i]}
+    echo "${COMP_WORDS[i]}"
     return 0
   done
   echo ""
 }
 
-_complete-vms() {
-  local vms
+
+# ---------------------------------------------------------------------------
+# Completion functions (set COMPREPLY)
+
+# Sets COMPREPLY to an array of qubes in a given state
+_complete-qubes() {
+  local qubes
   local state="${1}"
+  local state_re=''
   local cur="${COMP_WORDS[COMP_CWORD]}"
   case "${state}" in
-    runtrans)
-      vms="$(qvm-ls --no-spinner --raw-data --fields=NAME,STATE |
-             grep -i "|\(running$\|transient$\)" | cut -d "|" -f1)"
-      ;;
     running|halted|paused)
-      vms="$(qvm-ls --no-spinner --raw-list "--${state}")"
+      state_re="${state}"
       ;;
-    "")
-      vms="$(qvm-ls --no-spinner --raw-list)"
+    runtrans)
+      state_re='\(running\|transient\)'
+      ;;
+    any_state)
+      state_re='[^|]\+'
       ;;
   esac
-  COMPREPLY=( $(compgen -W "${vms}" -- "${cur}") )
+  qubes=$(qvm-ls --raw-data | grep -v '^dom0|' | \
+    grep -i "^[^|]\+|${state_re}|" | cut -f1 -d"|")
+  mapfile -t COMPREPLY < <(compgen -W "${qubes}" -- "${cur}")
   return 0
 }
 
-_complete-filenames() {
-  local cur="${COMP_WORDS[COMP_CWORD]}"
-  COMPREPLY=( $(compgen -f -- "$cur") )
-  return 0
-}
-
-_complete-vmprops() {
-  local vm="${1}"
+# Sets COMPREPLY to an array of qube properties (prefs, features, tags, service)
+_complete-qubeprops() {
+  local qube="${1}"
   local property="${2}"
   local props
   local cur="${COMP_WORDS[COMP_CWORD]}"
-  if qvm-check "${vm}" > /dev/null 2>&1; then
+  if qvm-check "${qube}" > /dev/null 2>&1; then
     case "${property}" in
-      prefs)
-        props=$(qvm-prefs "${vm}" | cut -f1 -d " ")
-        ;;
-      features)
-        props=$(qvm-features "${vm}" | cut -f1 -d " ")
-        ;;
-      tags)
-        props=$(qvm-tags "${vm}" | cut -f1 -d " ")
+      prefs|features|tags|service)
+        props=$("qvm-${property}" "${qube}" | \
+          cut -f1 -d " ")
         ;;
     esac
   fi
-  COMPREPLY=( $(compgen -W "${props}" -- "${cur}") )
+  mapfile -t COMPREPLY < <(compgen -W "${props}" -- "${cur}")
+}
+
+# Sets COMPREPLY to an array of qvm-tags options
+_complete-qvm-tags-actions() {
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local options=$(qvm-tags --help | \
+    sed -ne 's/.*VMNAME {\([^}]\+\)}.*/\1/p' | tr ',' '\n')
+  mapfile -t COMPREPLY < <(compgen -W "${options}" -- "${cur}")
+}
+
+
+# Sets COMPREPLY to an array of file names
+_complete-filenames() {
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  mapfile -t COMPREPLY < <(compgen -f -- "$cur")
+  return 0
 }
 
 
 
-## WRAPPERS and COMPLETE functions
-## ===============================
-##----- args: vm(all) -----
-_qvm-vms-all-all() {
-  _complete-vms ""
+# ---------------------------------------------------------------------------
+# "Link" completion functions to qvm-* commands
+
+# complete each argument with qubes in any state
+_qvmcmd-any_state-all_args() {
+  _complete-qubes "any_state"
 }
-complete -F _qvm-vms-all-all qvm-backup
-complete -F _qvm-vms-all-all qvm-ls
+complete -F _qvmcmd-any_state-all_args qvm-backup
+complete -F _qvmcmd-any_state-all_args qvm-ls
 
 
-#----- arg1: vm(all) -----
-_qvm-vms-all() {
-  [ $(_get-cword ${COMP_CWORD}) = 1 ] && _complete-vms ""
+# complete the first argument with qubes in a given state
+_qvmcmd-in_state() {
+  local state="$1"
+  [ "$(_get-cword-pos "${COMP_CWORD}")" = 1 ] &&
+    _complete-qubes "${state}"
 }
-complete -F _qvm-vms-all qvm-check
-complete -F _qvm-vms-all qvm-clone
-complete -F _qvm-vms-all qvm-firewall
-complete -F _qvm-vms-all qvm-remove
-complete -F _qvm-vms-all qvm-run
-complete -F _qvm-vms-all qvm-service
-complete -F _qvm-vms-all qvm-start-gui
-complete -F _qvm-vms-all qvm-usb
-complete -F _qvm-vms-all qvm-terminal # ~/.config/sh/shrc alias
+
+_qvmcmd-any_state() { _qvmcmd-in_state "any_state"; }
+complete -F _qvmcmd-any_state qvm-check
+complete -F _qvmcmd-any_state qvm-clone
+complete -F _qvmcmd-any_state qvm-firewall
+complete -F _qvmcmd-any_state qvm-remove
+complete -F _qvmcmd-any_state qvm-run
+complete -F _qvmcmd-any_state qvm-service
+complete -F _qvmcmd-any_state qvm-start-gui
+complete -F _qvmcmd-any_state qvm-usb
+
+_qvmcmd-halted() { _qvmcmd-in_state "halted"; }
+complete -F _qvmcmd-halted qvm-start
+
+_qvmcmd-paused() { _qvmcmd-in_state "paused"; }
+complete -F _qvmcmd-paused qvm-unpause
+
+_qvmcmd-running() { _qvmcmd-in_state "running"; }
+complete -F _qvmcmd-running qvm-pause
+complete -F _qvmcmd-running qvm-shutdown
+
+_qvmcmd-runtrans() { _qvmcmd-in_state "runtrans"; }
+complete -F _qvmcmd-runtrans qvm-kill
 
 
-#----- arg1: vm(halted) -----
-_qvm-vms-halted() {
-  [ $(_get-cword ${COMP_CWORD}) = 1 ] && _complete-vms "halted"
-}
-complete -F _qvm-vms-halted qvm-start
-
-
-#----- arg1: vm(paused) -----
-_qvm-vms-paused() {
-  [ $(_get-cword ${COMP_CWORD}) = 1 ] && _complete-vms "paused"
-}
-complete -F _qvm-vms-paused qvm-unpause
-
-
-#----- arg1: vm(running) -----
-_qvm-vms-running() {
-  [ $(_get-cword ${COMP_CWORD}) = 1 ] && _complete-vms "running"
-}
-complete -F _qvm-vms-running qvm-pause
-complete -F _qvm-vms-running qvm-shutdown
-
-
-#----- arg1: vm(running|transient) -----
-_qvm-vms-runtrans() {
-  [ $(_get-cword ${COMP_CWORD}) = 1 ] && _complete-vms "runtrans"
-}
-complete -F _qvm-vms-runtrans qvm-kill
-
-
-#----- arg1: vm(all) ; arg(>=2): filenames -----
-_qvm-vms-all-filenames() {
-  if [ "$(_get-cword ${COMP_CWORD})" -eq 1 ]; then
-     _complete-vms ""
+# complete the first argument with qubes in any state
+# complete n>=2 arguments with filenames
+_qvmcmd-any_state-filenames() {
+  if [ "$(_get-cword-pos "${COMP_CWORD}")" = 1 ]; then
+     _complete-qubes "any_state"
   else
     _complete-filenames
   fi
 }
-complete -F _qvm-vms-all-filenames qvm-copy-to-vm
-complete -F _qvm-vms-all-filenames qvm-move-to-vm
+complete -F _qvmcmd-any_state-filenames qvm-copy-to-vm
+complete -F _qvmcmd-any_state-filenames qvm-move-to-vm
 
 
-#----- arg1: vm(all) ; arg2: vm preferences -----
-_qvm-vms-all-vmprefs() {
-  case "$(_get-cword ${COMP_CWORD})" in
-    1) _complete-vms "" ;;
-    2) _complete-vmprops "$(_get-first-word)" "prefs";;
+# complete the first argument with qubes in any state
+# complete the second argument with qube properties (features, prefs, ...)
+_qvmcmd-any_state-qubeprop() {
+  local property="$1"
+  case "$(_get-cword-pos "${COMP_CWORD}")" in
+    1) _complete-qubes "any_state" ;;
+    2) _complete-qubeprops "$(_get-first-cword)" "${property}" ;;
   esac
 }
-complete -F _qvm-vms-all-vmprefs qvm-prefs
+
+_qvmcmd-any_state-qubeprefs() { _qvmcmd-any_state-qubeprop "prefs"; }
+complete -F _qvmcmd-any_state-qubeprefs qvm-prefs
+
+_qvmcmd-any_state-qubefeatures() { _qvmcmd-any_state-qubeprop "features"; }
+complete -F _qvmcmd-any_state-qubefeatures qvm-features
+
+_qvmcmd-any_state-qubeservice() { _qvmcmd-any_state-qubeprop "service"; }
+complete -F _qvmcmd-any_state-qubeservice qvm-service
 
 
-#----- arg1: vm(all) ; arg2: vm features -----
-_qvm-vms-all-vmfeatures() {
-  case "$(_get-cword ${COMP_CWORD})" in
-    1) _complete-vms "" ;;
-    2) _complete-vmprops "$(_get-first-word)" "features";;
+# complete the first argument with qubes in any state
+# complete the second argument with qvm-tags actions
+# complete the third argument with qube properties (features, prefs, ...)
+_qvmcmd-any_state-qubetags() {
+  case "$(_get-cword-pos "${COMP_CWORD}")" in
+    1) _complete-qubes "any_state" ;;
+    2) _complete-qvm-tags-actions ;;
+    3) _complete-qubeprops "$(_get-first-cword)" "tags" ;;
   esac
 }
-complete -F _qvm-vms-all-vmfeatures qvm-features
-
-
-#----- arg1: vm(all) ; arg2: vm tags -----
-_qvm-vms-all-vmtags() {
-  case "$(_get-cword ${COMP_CWORD})" in
-    1) _complete-vms "" ;;
-    2) _complete-vmprops "$(_get-first-word)" "tags";;
-  esac
-}
-complete -F _qvm-vms-all-vmtags qvm-tags
+complete -F _qvmcmd-any_state-qubetags qvm-tags
