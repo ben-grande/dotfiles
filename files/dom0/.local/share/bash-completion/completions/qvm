@@ -1,15 +1,14 @@
-# bash completion for qvm                                  -*- shell-script -*-
+# bash completion for qvm                                 -*- shell-script -*-
 ## vim: set ft=bash
 
-## SPDX-FileCopyrightText: 2018 taradiddles
+## SPDX-FileCopyrightText: 2018 Bernhard Haaber <https://forum.qubes-os.org/u/haaber>
+## SPDX-FileCopyrightText: 2018 Ivan <https://github.com/taradiddles>
 ##
-## SPDX-License-Identifier: GPL-3.0-only
+## SPDX-License-Identifier: GPL-2.0-only
 
 ## Credits:
-## - credit to haaber for the original PoC !
 ## - https://www.mail-archive.com/qubes-users@googlegroups.com/msg20088.html
-## - https://github.com/Qubes-Community/Contents/blob/master/code/productivity/qvm-cmds-bash-completion.bash
-## @taradiddles - apr 2018 - GPL
+## - https://github.com/taradiddles/qubes-os-qvm-bash-completion
 
 
 ## COMPLETION FUNCTIONS
