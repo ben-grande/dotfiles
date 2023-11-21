@@ -143,7 +143,7 @@
 	rebase = false
 [push]
 	autoSetupRemote = true
-	default = upstream
+	default = current
 	gpgSign = if-asked
 [rebase]
 	autoSquash = true
