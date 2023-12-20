@@ -9,6 +9,7 @@ set -eu
 
 source_dirs="
 /etc/qubes/policy.d
+/etc/qubes/backup
 "
 
 target_dir="/home/user/backup/$(date +%Y-%m-%d_%H-%M)"
