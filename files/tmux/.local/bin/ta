@@ -79,13 +79,13 @@ main(){
   else
 
     ## Outside of tmux.
-    if test -n "$ta_session" && ! tmux list-session 2>/dev/null; then
+    if test -n "$ta_session" && ! tmux list-sessions >/dev/null 2>&1; then
       ## Session name was specified but server is not running.
       tmux new-session -s "$ta_session"
       tmux display-message "Created session $ta_session"
       return 0
 
-    elif ! tmux list-session 2>/dev/null; then
+    elif ! tmux list-sessions >/dev/null 2>&1; then
       ## Server is not running.
       ta_new || return 1
       tmux new-session -s "$ta_name"
