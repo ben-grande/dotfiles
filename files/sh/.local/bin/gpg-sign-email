@@ -42,6 +42,6 @@ for f in "${@}"; do
   cp "$f" "$f.asc"
   "$vi_cmd" -u NONE \
     -c 'set nomodeline' -c 'norm gg}j' \
-    -c '.,$!gpgw -a --clear-sign' \
+    -c '.,$!gpg -a --clear-sign' \
     -c 'wq' -- "$f.asc"
 done

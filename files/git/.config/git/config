@@ -121,7 +121,7 @@
 	signatureFile = ~/.signature
 	outputDirectory = /tmp/patch
 [gpg]
-	program = gpgw
+	program = gpg
 	minTrustLevel = fully
 [grep]
 	extendedRegexp = true

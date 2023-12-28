@@ -97,11 +97,6 @@ has fdfind && alias fd="fdfind"
 has lynx && alias lynx="lynx -vikeys"
 has qubesctl && alias qubesctl="sudo qubesctl --show-output" qctl="qubesctl"
 has gpg && alias gpgs="gpg --show-keys"
-has gpg2 && alias gpg="gpg2"
-if has qubes-gpg-client-wrapper; then
-  alias qubes-gpg="qubes-gpg-client-wrapper"
-  alias qgpg="qubes-gpg"
-fi
 ## {{{ Tmux
 has tmux && {
   alias t="tmux"

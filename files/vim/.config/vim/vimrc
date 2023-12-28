@@ -245,9 +245,9 @@ vnoremap . :normal .<CR>
 vnoremap > >gv
 vnoremap < <gv
 
-vnoremap <leader>ge !gpgw -aser
-vnoremap <leader>gs !gpgw -a --clear-sign<CR>
-vnoremap <leader>gd !gpgw -d<CR>
+vnoremap <leader>ge !gpg -aser
+vnoremap <leader>gs !gpg -a --clear-sign<CR>
+vnoremap <leader>gd !gpg -d<CR>
 
 nnoremap <leader>r "hyiw:%s/<C-R>h//g<left><left>
 nnoremap <leader>s "hyiw/<C-R>h
