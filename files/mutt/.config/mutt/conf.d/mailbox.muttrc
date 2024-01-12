@@ -44,11 +44,15 @@ set forward_format    = "Fwd: %s"
 set forward_quote
 
 ## Cache
-set mbox              = "~/.cache/mutt/archived"
-set record            = "~/.cache/mutt/sent"
-set postponed         = "~/.cache/mutt/postponed"
-set header_cache      = "~/.cache/mutt/headers"
-set message_cachedir  = "~/.cache/mutt/messages"
-set certificate_file  = "~/.cache/mutt/certificates"
+set mbox                = "~/.cache/mutt/archived"
+set record              = "~/.cache/mutt/sent"
+set postponed           = "~/.cache/mutt/postponed"
+set header_cache        = "~/.cache/mutt/headers"
+set message_cachedir    = "~/.cache/mutt/messages"
+set certificate_file    = "~/.cache/mutt/certificates"
+set history_file        = "~/.cache/mutt/history"
+set history             = 1000
+set history_remove_dups = yes
+set save_history        = 1
 
 ## vim: ft=muttrc
