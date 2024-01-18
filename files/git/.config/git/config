@@ -17,6 +17,7 @@
 	st = status
 	df = diff
 	dc = diff --cached
+	ds = diff --stat -r
 	in = init
 	inb = init --bare
 	ci = commit
@@ -37,7 +38,7 @@
 	rp  = remote prune
 	rnm = remote rename
 	rmv = remote remove
-	cf = config --file "$HOME/.gitconfig.local"
+	cf = !git config --file ~/.gitconfig.local
 	; Helpers
 	aliases = "!sh -c 'if test -n \"$1\"; then git config --get alias.$1; else git config --get-regexp \"alias.*\" | colrm 1 6 | sed \"s/[ ]/ = /\"; fi'" -
 	; Patch with subject prefix containing repository name and output
@@ -53,11 +54,8 @@
 			--subject-prefix=\"PATCH ${repo}\" \"${@}\" \
 			--diff-algorithm=histogram \
 		'" -
-	last = log -1 HEAD
 	unstage = reset HEAD --
 	undo = reset --soft HEAD^
-	changes = diff --name-status -r
-	diffstat = diff --stat -r
 	who = shortlog -s --
 	; whois <author name/e-mail>
 	whois = log -i -1 --pretty='format:%an <%ae>' --author
@@ -75,7 +73,7 @@
 	oneline ="!_() { $(test $# -eq 0 && echo xargs -L1) git log --no-walk --decorate --oneline \"$@\"; }; _"
 	tips = "!_() { t=$(git rev-list --no-merges --max-count=1 \"$@\"); if test -n \"$t\"; then echo $t; _ \"$@\" ^$t; fi; }; _"
 	; Submodules.
-	sub-update-recurse = !sh -c 'git checkout $1 && git submodule update --recursive'
+	sub-update = !sh -c 'git checkout $1 && git submodule update --recursive'
 	; Signed tags and commits
 	stag = "!sh -c '\
 		commit_id=\"$(git rev-parse --verify HEAD)\"; \
@@ -84,8 +82,8 @@
 		echo \"$tag_name\"'"
 	ptag = !git push $(git config branch.$(git branch --show-current).remote) $(git describe)
 	vtag = !git verify-tag -v $(git describe)
-	vheadcommit = !git verify-commit -v $(git rev-parse HEAD)
-	vheadtag = !git verify-tag -v $(git tag --points-at=HEAD)
+	vhci = !git verify-commit -v $(git rev-parse HEAD)
+	vhtag = !git verify-tag -v $(git tag --points-at=HEAD)
 [blame]
 	coloring = repeatedLines
 [branch]
