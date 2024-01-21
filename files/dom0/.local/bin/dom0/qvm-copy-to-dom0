@@ -8,42 +8,24 @@
 set -eu
 
 usage(){
-  echo "usage: ${0##*/} <QUBE> <FILE> <FILE2...>" >&2
+  echo "usage: ${0##*/} <QUBE> <FILE> <FILE2...>
+note: disk quota is capped and can be controlled via environment variables:
+note:   UPDATES_MAX_BYTES (default: 4GiB)
+note:   UPDATES_MAX_FILES (default: 2048)" >&2
   exit 1
 }
 
-run_qube(){
-  qvm-run -p "${qube}" "${1}"
-}
-
 main(){
-  qube_file="${1}"
-  qube_dir="${qube_file%/*}"
-  qube_base="${qube_file##*/}"
-
-  incoming_dir="/home/user/QubesIncoming/${qube}"
-  mkdir -p -- "${incoming_dir}"
-  incoming_file="${incoming_dir}/${qube_base}"
-  incoming_base="${qube_base}"
-
-  if test -e "${incoming_file}"; then
-    echo "Error: destination already exists: ${incoming_file}" >&2
-    exit 1
-  fi
-
-  if ! run_qube "test -e ${qube_file}"; then
-    echo "Error: Qube ${qube} does not contain file ${qube_file}" >&2
-    exit 1
-  fi
-
-  if run_qube "test -d \"${qube_file}\""; then
-    run_qube "tar -cC \"${qube_dir}\" \"${qube_base}\" " \
-      | tar -xC "${incoming_dir}" "${incoming_base}"
-  else
-    run_qube "cat -- \"${qube_file}\"" > "${incoming_file}"
-  fi
+  file="${1}"
+  dir="${HOME}/QubesIncoming/${qube}"
+  user="$(qvm-prefs --get -- "${qube}" default_user)"
+  max_bytes="${UPDATES_MAX_BYTES:-4GiB}"
+  max_files="${UPDATES_MAX_FILES:-2048}"
+  qvm-run --pass-io --localcmd="
+    UPDATES_MAX_BYTES=\"${max_bytes}\" UPDATES_MAX_FILES=\"${max_files}\"
+    /usr/libexec/qubes/qfile-dom0-unpacker \"${user}\" \"${dir}\"" \
+    "${qube}" /usr/lib/qubes/qfile-agent "${file}"
 }
-
 
 test -n "${2-}" || usage
 qube="${1}"
