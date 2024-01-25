@@ -15,25 +15,15 @@ note:   UPDATES_MAX_FILES (default: 2048)" >&2
   exit 1
 }
 
-main(){
-  file="${1}"
-  dir="${HOME}/QubesIncoming/${qube}"
-  user="$(qvm-prefs --get -- "${qube}" default_user)"
-  max_bytes="${UPDATES_MAX_BYTES:-4GiB}"
-  max_files="${UPDATES_MAX_FILES:-2048}"
-  qvm-run --pass-io --localcmd="
-    UPDATES_MAX_BYTES=\"${max_bytes}\" UPDATES_MAX_FILES=\"${max_files}\"
-    /usr/libexec/qubes/qfile-dom0-unpacker \"${user}\" \"${dir}\"" \
-    "${qube}" /usr/lib/qubes/qfile-agent "${file}"
-}
-
 test -n "${2-}" || usage
 qube="${1}"
 shift
 
-while true; do
-  main "${1}"
-  shift
-  test -z "${1-}" || continue
-  break
-done
+dir="${HOME}/QubesIncoming/${qube}"
+user="$(qvm-prefs --get -- "${qube}" default_user)"
+max_bytes="${UPDATES_MAX_BYTES:-4GiB}"
+max_files="${UPDATES_MAX_FILES:-2048}"
+qvm-run --pass-io --localcmd="
+  UPDATES_MAX_BYTES=\"${max_bytes}\" UPDATES_MAX_FILES=\"${max_files}\"
+  /usr/libexec/qubes/qfile-dom0-unpacker \"${user}\" \"${dir}\"" \
+  "${qube}" /usr/lib/qubes/qfile-agent "${@}"
