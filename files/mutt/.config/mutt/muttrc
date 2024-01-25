@@ -5,11 +5,11 @@
 ## Source configuration
 cd ~/.config/mutt
 source ~/.muttrc-credentials.local
-source conf.d/server.muttrc
-source conf.d/mailbox.muttrc
-source conf.d/pgp.muttrc
-source conf.d/bindings.muttrc
-source conf.d/colors.muttrc
+source server.muttrc
+source mailbox.muttrc
+source pgp.muttrc
+source bindings.muttrc
+source colors.muttrc
 source ~/.muttrc-aliases.local
 source ~/.muttrc.local
 ## vim: ft=muttrc

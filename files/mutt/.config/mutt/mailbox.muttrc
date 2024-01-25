@@ -15,7 +15,7 @@ set honor_followup_to = yes
 ## Reading
 set mark_old          = no
 set date_format       = "%y-%m-%d %T"
-set index_format      = "%4C %Z %D %-8.8n %-12.12L (%4l) %s"
+set index_format      = "%4C %Z %{%b %d} %-12.12L (%4l) %s"
 set sort              = "reverse-threads"
 set sort_aux          = "last-date-received"
 set content_type      = "text/plain"
@@ -25,9 +25,11 @@ set my_editor         = "vim -c 'setf mail' "
 set editor            = "$my_editor "
 
 ## Composing
-## Option 'use_envelope_from' does not work reliably, force Message-ID format.
-## To remove hostname message.
+## Option 'use_envelope_from' does not work reliably, force Message-ID
+## format to remove hostname from the header.
 set message_id_format = "<%z@%r%r>"
+set from              = "$my_user@$my_server"
+set use_from          = yes
 set fast_reply        = yes
 set edit_headers      = yes
 set copy              = yes
@@ -54,5 +56,8 @@ set history_file        = "~/.cache/mutt/history"
 set history             = 1000
 set history_remove_dups = yes
 set save_history        = 1
+
+## Alias
+alias me $realname <$from>
 
 ## vim: ft=muttrc
