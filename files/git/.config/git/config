@@ -149,7 +149,7 @@
 	annotate = true
 	multiEdit = true
 	confirm = always
-	thread = shallow
+	thread = true
 	chainReplyTo = true
 	xmailer = false
 [tag]
