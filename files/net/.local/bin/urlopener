@@ -7,7 +7,7 @@
 set -eu
 
 if command -v qvm-open-in-dvm >/dev/null; then
-  qvm-open-in-dvm @default "$1"
+  qvm-open-in-dvm --view-only -- "$1"
 elif test -n "${BROWSER-}"; then
   "${BROWSER}" "$1"
 else
