@@ -8,10 +8,9 @@
 
 ## Hooks
 send-hook "~A" "set pgp_autoinline=no"
-send-hook "~t ^security@qubes-os\\.org$" "set pgp_autoinline=yes crypt_autoencrypt=yes"
-send-hook "~t @invisiblethingslab\\.com" "set pgp_autoinline=yes crypt_autoencrypt=yes"
+send-hook "~t ^security@qubes-os\\.org$" "set pgp_autoinline=no crypt_autoencrypt=yes"
+send-hook "~t @invisiblethingslab\\.com" "set pgp_autoinline=no crypt_autoencrypt=yes"
 send-hook "~t @googlegroups\\.com" "set pgp_autoinline=yes crypt_autoencrypt=no"
-send-hook "~t $from" "set pgp_autoinline=yes"
 
 ## General Encryption and Signature
 set crypt_autopgp            = yes # Use PGP for encryption

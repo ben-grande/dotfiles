@@ -1,0 +1,4 @@
+## Copy to ~/.muttrc-aliases.local and modify.
+## Optional configuration.
+
+alias qubes-devel <qubes-devel@googlegroups.com>

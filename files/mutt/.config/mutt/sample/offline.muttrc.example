@@ -1,0 +1,19 @@
+## Copy to ~/.config/mutt/offline.muttrc and modify.
+
+## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: AGPL-3.0-or-later
+
+set read_only     = yes
+
+unset spoolfile
+unset folder
+unset smtp_url
+set imap_passive  = yes
+
+set sendmail      = "env EMAIL_CONN_TEST=x /usr/libexec/msmtp/msmtpq/msmtpq"
+set sendmail_wait = 0
+set folder        = "~/mail"
+set spoolfile     = "+INBOX"
+
+## vim: ft=muttrc

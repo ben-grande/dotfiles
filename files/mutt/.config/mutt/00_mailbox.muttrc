@@ -23,6 +23,9 @@ set charset           = "utf-8"
 set pager_index_lines = 5
 set my_editor         = "vim -c 'setf mail' "
 set editor            = "$my_editor "
+set mailcap_path      = "~/.mailcap"
+unauto_view *
+auto_view text/plain text/html
 
 ## Composing
 ## Option 'use_envelope_from' does not work reliably, force Message-ID
@@ -46,6 +49,10 @@ set forward_format    = "Fwd: %s"
 set forward_quote
 
 ## Cache
+set spoolfile         = "+INBOX"
+## GMail duplicates sent mails if the 'record' option is set.
+#set record            = "+Sent"
+unset record
 set mbox                = "~/.cache/mutt/archived"
 set record              = "~/.cache/mutt/sent"
 set postponed           = "~/.cache/mutt/postponed"

@@ -1,0 +1,8 @@
+## Copy to ~/.muttrc.local and modify.
+## Optional configuration.
+## Last file to be source: overrides previous definitions.
+
+lists .*@googlegroups\\.com
+subscribe qubes-(announce|devel)@googlegroups\\.com
+fcc-save-hook qubes-announce@googlegroups\\.com =list/qubes-announce/
+fcc-save-hook qubes-devel@googlegroups\\.com =list/qubes-devel/

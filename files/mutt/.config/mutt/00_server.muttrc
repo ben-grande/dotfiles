@@ -4,7 +4,6 @@
 
 ## IMAP
 set folder            = "imaps://imap.$my_server"
-set spoolfile         = "+INBOX"
 set imap_user         = "$my_user"
 set imap_pass         = "$my_pass"
 set imap_check_subscribed
@@ -20,9 +19,6 @@ set pop_last          = yes
 
 ## SMTP
 set smtp_url          = "smtps://$my_user@smtp.$my_server"
-## GMail duplicates sent mails if the 'record' option is set.
-#set record            = "+Sent"
-unset record
 set smtp_pass         = "$my_pass"
 set realname          = "$my_name"
 set ssl_starttls      = yes

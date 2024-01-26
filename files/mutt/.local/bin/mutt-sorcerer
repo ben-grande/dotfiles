@@ -1,0 +1,35 @@
+#!/bin/sh
+##
+## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: AGPL-3.0-or-later
+##
+## Mutt Sorcerer - source Mutt configuration like a wizard
+## Useful if some configurations files in non-default locations might exist.
+
+set -eu
+
+credentials_file="${HOME}/.muttrc-credentials.local"
+aliases_file="${HOME}/.muttrc-aliases.local"
+local_file="${HOME}/.muttrc.local"
+
+## source_redable(): do not require that the file exists in the first place.
+source_existent(){
+  for file in "${@}"; do
+    if test -f "${file}"; then
+      echo source "\"${file}\""
+    fi
+  done
+  unset file
+}
+
+## Source files that must exist, let mutt fail otherwise.
+echo source "\"${credentials_file}\""
+
+## PWD is inherited from the muttrc that called this script.
+for file in *.muttrc; do
+  echo source "\"${file}\""
+done
+unset file
+
+source_existent "${aliases_file}" "${local_file}"

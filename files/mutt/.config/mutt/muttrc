@@ -2,14 +2,7 @@
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
-## Source configuration
+## Source all configurations
 cd ~/.config/mutt
-source ~/.muttrc-credentials.local
-source server.muttrc
-source mailbox.muttrc
-source pgp.muttrc
-source bindings.muttrc
-source colors.muttrc
-source ~/.muttrc-aliases.local
-source ~/.muttrc.local
+source mutt-sorcerer|
 ## vim: ft=muttrc
