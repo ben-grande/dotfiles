@@ -205,6 +205,10 @@ _get_prompt_time(){
 
 _git_prompt_info(){
   has git || return
+  ## Whonix UWT wrapper circumvents the command existence check.
+  if test -f /usr/share/whonix/marker; then
+    git -v >/dev/null 2>&1 || return
+  fi
   ref="$(git symbolic-ref HEAD 2>/dev/null | cut -d '/' -f3)"
   test "${ref-}" || ref="$(git describe --tags --exact-match HEAD 2>/dev/null)"
   test "${ref-}" || ref="$(git rev-parse HEAD 2>/dev/null | head -c 7)"
