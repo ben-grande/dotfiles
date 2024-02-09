@@ -121,6 +121,10 @@ fi
 ## }}}
 ## {{{ Git
 if has git; then
+  ## Whonix UWT wrapper circumvents the command existence check.
+  if test -f /usr/share/whonix/marker; then
+    git -v >/dev/null 2>&1 || return
+  fi
   alias g="git"
   alias gcd='cd "$(git rev-parse --show-toplevel)"'
   ## Use git aliases with 'g' prefix.
