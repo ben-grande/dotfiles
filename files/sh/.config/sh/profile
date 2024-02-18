@@ -127,6 +127,11 @@ if test -z "${SSH_AUTH_SOCK-}" && has ssh-agent; then
   eval "$(ssh-agent -s)" >/dev/null
 fi
 
+## Zsh sources this shell profile before no_nomatch is set in zshrc, thus
+## fails with "no matches found" when the glob can't be expanded.
+if test -n "${ZSH_VERSION:-}"; then
+  setopt no_nomatch
+fi
 for f in "$XDG_CONFIG_HOME/sh/profile.d"/*.sh; do
   # shellcheck disable=SC1090,SC1091
   ! test -r "$f" || . "$f"

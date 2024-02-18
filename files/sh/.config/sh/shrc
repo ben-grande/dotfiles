@@ -22,10 +22,6 @@ esac
 stty -ixon
 set -o noclobber
 set -o notify
-## Vi-mode does not work on Debian Bullseye with Dash 5.11 (2020).
-## Debian Boowkworm has Dash >5.11 (2021) with adds libedit to the shell.
-## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=561663
-#set -o vi
 #stty quit undef
 stty werase undef
 ## }}}
@@ -120,11 +116,10 @@ if has mutt; then
 fi
 ## }}}
 ## {{{ Git
-if has git; then
+if { ! test -f /usr/share/whonix/marker && has git; } ||
+   { test -f /usr/share/whonix/marker && git -v >/dev/null 2>&1; }
+then
   ## Whonix UWT wrapper circumvents the command existence check.
-  if test -f /usr/share/whonix/marker; then
-    git -v >/dev/null 2>&1 || return
-  fi
   alias g="git"
   alias gcd='cd "$(git rev-parse --show-toplevel)"'
   ## Use git aliases with 'g' prefix.
