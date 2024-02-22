@@ -92,11 +92,11 @@ Supported programs and the expected file names in `$HOME`:
 
 - **bash**: .bashrc.local
 - **git**:  .gitconfig.local
-- **sh**:   .profile.local, .shrc.local
+- **sh**:   .profile.local, .shrc.local, .config/sh/profile.d/ (.sh suffix)
 - **ssh**:  .ssh/config.d/ (.conf suffix), .ssh/known_hosts.d/ (.host suffix)
 - **tmux**: .tmux.conf.local
 - **vim**:  .vimrc.local
-- **x11**:  .xprofile.local
+- **x11**:  .xprofile.local, .config/x11/xprofile.d/ (.sh suffix)
 - **zsh**:  .zshrc.local
 
 ## License
