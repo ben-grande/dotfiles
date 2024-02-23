@@ -201,9 +201,8 @@ zmodload zsh/complist
 mkdir -p $XDG_CACHE_HOME/zsh
 compinit -u -d $XDG_CACHE_HOME/zsh/zcompdump
 # _comp_options+=(globdots)
-if has zoxide; then
-  eval "$(zoxide init zsh)"
-fi
+! has zoxide || eval "$(zoxide init zsh)"
+! has gitlint || eval "$(_GITLINT_COMPLETE=zsh_source gitlint)"
 ## }}}
 ## {{{ Plugins
 source_readable /usr/share/doc/fzf/examples/key-bindings.zsh
