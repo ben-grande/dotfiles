@@ -46,12 +46,12 @@ hardcoded to `user` and its home is hardcoded to `/home/user`.
 
 Install everything in a qube:
 ```sh
-qubesctl --skip-dom0 --targets=QUBE state.apply dotfiles.copy-all
+sudo qubesctl --skip-dom0 --targets=QUBE state.apply dotfiles.copy-all
 ```
 
 Install specific files in Dom0:
 ```sh
-qubesctl state.apply dotfiles.copy-dom0,dotfiles.copy-sh,dotfiles.copy-vim,dotfiles.copy-x11
+sudo qubesctl state.apply dotfiles.copy-dom0,dotfiles.copy-sh,dotfiles.copy-vim,dotfiles.copy-x11
 ```
 
 ### Script
