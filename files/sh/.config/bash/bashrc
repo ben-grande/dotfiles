@@ -77,9 +77,9 @@ newline=$'\n'
 
 if test "${color_prompt:-}" = "yes"; then
   # shellcheck disable=SC2154
-  PS1="\$(_reset_line)\[\033[35m\][\[${reset_color}\]${debian_chroot:+($debian_chroot)}\[${usercolor}\]\u@\h \[${dircolor}\]\w\[${reset_color}\]\$(_git_prompt_info)\[\033[35m\]]\[${reset_color}\]${newline-}\$(_print_ec)${ps1_symbol} "
+  PS1="\$(_reset_line)\$(resize-terminal)\[\033[35m\][\[${reset_color}\]${debian_chroot:+($debian_chroot)}\[${usercolor}\]\u@\h \[${dircolor}\]\w\[${reset_color}\]\$(_git_prompt_info)\[\033[35m\]]\[${reset_color}\]${newline-}\$(_print_ec)${ps1_symbol} "
 else
-  PS1="\$(_reset_line)[${debian_chroot:+($debian_chroot)}\u@\h:\w\$(_git_prompt_info)]${newline-}\$(_print_ec)${ps1_symbol} "
+  PS1="\$(_reset_line)\$(resize-terminal)[${debian_chroot:+($debian_chroot)}\u@\h:\w\$(_git_prompt_info)]${newline-}\$(_print_ec)${ps1_symbol} "
 fi
 
 case "${TERM-}" in

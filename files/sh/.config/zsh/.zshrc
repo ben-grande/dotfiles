@@ -71,10 +71,10 @@ if test "${color_prompt-}" = "yes"; then
   autoload -U colors && colors
   [[ "${COLORTERM-}" == (24bit|truecolor) || "${terminfo[colors]}" -eq '16777216' ]] || zmodload zsh/nearcolor
 
-  PS1="%F{magenta}[%{$usercolor%}%n@%M%F{reset_color%} %{$dircolor%}%50<...<%~%<<%F{reset_color%}\$(_git_prompt_info)%F{magenta}]%F{reset_color}${newline-}${ps1_symbol} "
+  PS1="\$(resize-terminal)%F{magenta}[%{$usercolor%}%n@%M%F{reset_color%} %{$dircolor%}%50<...<%~%<<%F{reset_color%}\$(_git_prompt_info)%F{magenta}]%F{reset_color}${newline-}${ps1_symbol} "
   RPS1="%(?..(%{"$'\e[31m'"%}%?%{$reset_color%}%)%<<)"
 else
-  PS1="[%n@%M %~\$(_git_prompt_info)]${newline}${ps1_symbol} "
+  PS1="\$(resize-terminal)[%n@%M %~\$(_git_prompt_info)]${newline}${ps1_symbol} "
   RPS1="%(?..(%?%)%<<)"
 fi
 

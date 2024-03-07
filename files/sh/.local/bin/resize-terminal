@@ -1,0 +1,83 @@
+#!/bin/sh
+
+## SPDX-FileCopyrightText: 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+##
+## SPDX-License-Identifier: GFDL-1.3-or-later
+##
+## Credits: https://wiki.archlinux.org/title/Working_with_the_serial_console#Resizing_a_terminal
+##
+## Resize terminal columns and lines to current window size.
+## Useful for terminals over link (serial console, socat's pty etc).
+
+test -t 0 || exit
+
+## If argument is provided, allow user to bypass tty check.
+if test "${#}" -eq 0; then
+  ## Shells on graphical sessions (terminal emulators) are skipped.
+  test "${XDG_SESSION_TYPE:-}" = "tty" || exit
+  ## Serial ports and devices are desired.
+  term_file="$(tty)"
+  term_file_wanted="ttyUSB ttyS"
+  ## Consoles are desired.
+  if test -r /sys/class/tty/console/active; then
+    term_file_wanted="${term_file_wanted} $(cat /sys/class/tty/console/active)"
+  fi
+  term_file_active=0
+  for tf in $(printf %s"${term_file_wanted}"); do
+    case "${term_file}" in
+      *"/${tf}"*) term_file_active=1;;
+      *) ;;
+    esac
+  done
+  unset tf term_file term_file_wanted
+  ## Terminal can handle screen resizing by itself.
+  if test "${term_file_active}" = "0"; then
+    unset term_file_active
+    exit
+  fi
+  unset term_file_active
+fi
+
+## POSIX compliant.
+# shellcheck disable=SC3045
+if ! echo R | read -r -t 1 -sd R 2>/dev/null; then
+  ## Fast but depends on XTerm.
+  if has resize; then
+    eval "$(resize)" >/dev/null
+    exit
+  fi
+  ## Slow due to heavy stty calls.
+  termios="$(stty -g)"
+  stty raw -echo min 0 time 1
+  printf '\0337\033[r\033[99999;99999H\033[6n\0338' >/dev/tty
+  IFS='[;R' read -r _ rows cols _ </dev/tty
+  stty "$termios" cols "$cols" rows "$rows"
+  unset termios
+  exit
+fi
+
+## Non-POSIX compliant and fast.
+stty -echo
+printf '\e7\e[r\033[99999;99999H\e[6n\e8' >/dev/tty
+# shellcheck disable=3045,SC2034
+IFS='[;R' read -r -t 1 -s -d R _ rows cols _ </dev/tty || {
+  echo "error: cannot resize screen: unsupported terminal emulator" >&2
+  stty echo
+  unset rows cols
+  exit 1
+}
+
+if test ${COLUMNS} -eq "${cols}" && test ${LINES} -eq "${rows}";then
+  stty echo
+  unset rows cols
+  exit
+elif test "${rows}" -gt 0 && test "${cols}" -gt 0;then
+  stty echo cols "${cols}" rows "${rows}"
+  unset rows cols
+  exit
+fi
+
+echo "error: cannot resize screen: unsupported terminal emulator" >&2
+stty echo
+unset rows cols
+exit 1
