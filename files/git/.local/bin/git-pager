@@ -1,6 +1,6 @@
 #!/bin/sh
 
-## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -9,5 +9,22 @@ set -eu
 if command -v delta >/dev/null; then
   exec delta "$@"
 else
+  : "${DIFF_HIGHLIGHT_SOURCE:=/usr/share/doc/git/contrib/diff-highlight}"
+  : "${DIFF_HIGHLIGHT_EXEC:=/usr/share/git-core/contrib/diff-highlight}"
+
+  ## Debian.
+  if command -v perl &&
+    test -f "${DIFF_HIGHLIGHT_SOURCE}/DiffHighlight.pm" &&
+    test -f "${DIFF_HIGHLIGHT_SOURCE}/diff-highlight.perl"
+  then
+    exec perl -I "${DIFF_HIGHLIGHT_SOURCE}" -MDiffHighlight -- \
+      "${DIFF_HIGHLIGHT_SOURCE}/diff-highlight.perl" | less -RS
+
+  ## Fedora.
+  elif command -v perl && test -f "${DIFF_HIGHLIGHT_EXEC}"
+  then
+    exec "${DIFF_HIGHLIGHT_EXEC}" | less -RS
+  fi
+
   exec less -RS "$@"
 fi

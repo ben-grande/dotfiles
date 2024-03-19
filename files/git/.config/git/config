@@ -128,7 +128,7 @@
 	defaultbranch = main
 	templatedir = ~/.config/git/template
 [interactive]
-	diffFilter = delta --color-only
+	diffFilter = git-pager
 [mailinfo]
 	scissors = true
 [merge]
