@@ -76,10 +76,11 @@
 	sub-update = !sh -c 'git checkout $1 && git submodule update --recursive'
 	; Signed tags and commits
 	stag = "!sh -c '\
-		commit_id=\"$(git rev-parse --verify HEAD)\"; \
+		commit_id=\"$(git rev-parse --verify \"$@\")\"; \
 		tag_name=\"signed_tag_for_$(echo $commit_id | head -c 8)\"; \
-		git tag -s \"$tag_name\" -m \"Tag for commit $commit_id\"; \
-		echo \"$tag_name\"'"
+		git tag -s \"$tag_name\" \
+			-m \"Tag for commit $commit_id\" \"$commit_id\"; \
+		echo \"$tag_name\"'" -
 	ptag = !git push $(git config branch.$(git branch --show-current).remote) $(git describe)
 	vtag = !git verify-tag -v $(git describe)
 	vhci = !git verify-commit -v $(git rev-parse HEAD)
