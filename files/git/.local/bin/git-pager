@@ -13,7 +13,7 @@ else
   : "${DIFF_HIGHLIGHT_EXEC:=/usr/share/git-core/contrib/diff-highlight}"
 
   ## Debian.
-  if command -v perl &&
+  if command -v perl >/dev/null &&
     test -f "${DIFF_HIGHLIGHT_SOURCE}/DiffHighlight.pm" &&
     test -f "${DIFF_HIGHLIGHT_SOURCE}/diff-highlight.perl"
   then
@@ -21,7 +21,7 @@ else
       "${DIFF_HIGHLIGHT_SOURCE}/diff-highlight.perl" | less -RS
 
   ## Fedora.
-  elif command -v perl && test -f "${DIFF_HIGHLIGHT_EXEC}"
+  elif command -v perl >/dev/null && test -f "${DIFF_HIGHLIGHT_EXEC}"
   then
     exec "${DIFF_HIGHLIGHT_EXEC}" | less -RS
   fi
