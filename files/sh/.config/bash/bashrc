@@ -46,7 +46,7 @@ _reset_line() {
 
   local termios cur_y
   ## Ask the terminal for any pending (line buffered) input.
-  termios=$(stty --save) && stty -icanon && stty "$termios"
+  termios=$(stty -g) && stty -icanon && stty "$termios"
   ## On pending input, assume it's been echoed and we're not in first column.
   ## Otherwise ask the terminal for current column and read it from input.
   if read -t 0 || {

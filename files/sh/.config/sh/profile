@@ -94,12 +94,19 @@ KDEHOME="$XDG_CONFIG_HOME/kde"
 #KDEROOTHOME="/root/.config/kde"
 INPUTRC="$BASHDIR/inputrc"
 if has less; then
-  if test "$(less -V | awk -F '[ .]' 'NR==1 {print $2}')" -ge 582; then
+  lesskey_src=0
+  less_version="$(less -V | awk -F '[ .]' 'NR==1 {print $2}')"
+  case "${less_version}" in
+    ""|*[!0-9]*) ;;
+    *) if test "${less_version}" -ge 582; then lesskey_src=1; fi;;
+  esac
+  if test "${lesskey_src}" = "1"; then
     LESSKEY="$XDG_CONFIG_HOME/less/lesskey"
   elif has lesskey; then
     LESSKEY="$XDG_CONFIG_HOME/less/lesskey-old"
     lesskey -o "$LESSKEY" "$XDG_CONFIG_HOME/less/lesskey"
   fi
+  unset lesskey_src less_version
 fi
 export GTK2_RC_FILES KDEHOME KDEROOTHOME INPUTRC LESSKEY
 

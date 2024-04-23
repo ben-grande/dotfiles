@@ -8,5 +8,7 @@
 ## some distributions such as Qubes, Whonix, Debian, Gentoo ship files to
 ## /etc/profile.d.
 
-emulate sh -c "source /etc/profile"
+if test -r /etc/profile; then
+  emulate sh -c "source /etc/profile"
+fi
 . "$HOME/.profile"

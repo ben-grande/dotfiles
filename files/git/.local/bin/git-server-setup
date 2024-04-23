@@ -39,7 +39,7 @@ chmod -R 0755 "$git_home/git-shell-commands"
 
 git config --system receive.updateServerInfo true
 git config --system receive.advertisePushOptions true
-nonce="$(head /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' | head -c 256)"
+nonce="$(head /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9!#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' | cut -c 1-256)"
 git config --system receive.certNonceSeed "$nonce"
 
 chown -R "$git_user":"$git_user" "$git_home"

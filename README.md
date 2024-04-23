@@ -28,7 +28,7 @@ Configuration and scripts targeting:
 - Portability:
   - POSIX compliant code
   - Drop-in configuration files
-  - Tested in Qubes OS Dom0, Debian, Fedora
+  - Tested in Qubes OS Dom0, Debian, Fedora, OpenBSD
 - Tasks:
   - GUI: x11, gtk
   - SCM: git, tig, git-shell

@@ -38,7 +38,9 @@ if has lsblk; then
   alias lsblk='lsblk -o $_lsblk_options'
   alias lsblku='lsblk -o $_lsblk_options,UUID,PARTUUID'
 fi
-if ! grep --color 2>&1 | grep -q "unrecognized option"; then
+if ! grep --color 2>&1 | grep -qE "(unrecognized|unknown) option" &&
+   ! grep --exclude 2>&1 | grep -qE "(unrecognized|unknown) option"
+then
   alias grep="grep --exclude='.*.swp' --exclude='*~' --color=auto"
 fi
 alias fgrep="grep -F"
@@ -210,7 +212,7 @@ _git_prompt_info(){
   fi
   ref="$(git symbolic-ref HEAD 2>/dev/null | cut -d '/' -f3)"
   test "${ref-}" || ref="$(git describe --tags --exact-match HEAD 2>/dev/null)"
-  test "${ref-}" || ref="$(git rev-parse HEAD 2>/dev/null | head -c 7)"
+  test "${ref-}" || ref="$(git rev-parse HEAD 2>/dev/null | cut -c 1-7)"
   test "${ref-}" || return
   # shellcheck disable=2039,3003
   case "${TERM-}" in

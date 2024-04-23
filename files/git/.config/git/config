@@ -77,7 +77,7 @@
 	; Signed tags and commits
 	stag = "!sh -c '\
 		commit_id=\"$(git rev-parse --verify \"$@\")\"; \
-		tag_name=\"signed_tag_for_$(echo $commit_id | head -c 8)\"; \
+		tag_name=\"signed_tag_for_$(echo $commit_id | cut -c 1-8)\"; \
 		git tag -s \"$tag_name\" \
 			-m \"Tag for commit $commit_id\" \"$commit_id\"; \
 		echo \"$tag_name\"'" -
