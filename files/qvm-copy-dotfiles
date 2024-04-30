@@ -23,12 +23,14 @@ test -f ./setup.sh || { echo "File doesn't exist: './setup.sh'"; exit 1; }
 
 if test "$vm" = "dom0"; then
   sh ./dotfiles/setup.sh
-  sudo -u user mkdir -pv /home/user/.cache
-  tmpdir="$(sudo -u user mktemp -d /home/user/.cache/XXXXXX)"
+  user_name="$(getent group qubes | awk -F "[:,]" '{print $4}')"
+  user_home="$(getent passwd "${user_name}" | awk -F ":" '{print $6}')"
+  sudo -u "${user_name}" mkdir -pv "${user_home}/.cache"
+  tmpdir="$(sudo -u "${user_name}" mktemp -d "${user_home}/.cache/XXXXXX")"
   trap 'rm -rf -- "$tmpdir"' EXIT INT HUP QUIT ABRT
   cp -r ./dotfiles "$tmpdir"
-  chown -R user:user "$tmpdir"
-  sudo -u user "$tmpdir/dotfiles/setup.sh"
+  chown -R "${user_name}:${user_name}" "$tmpdir"
+  sudo -u "${user_name}" "$tmpdir/dotfiles/setup.sh"
   exit
 fi
 

@@ -41,8 +41,11 @@ Configuration and scripts targeting:
 
 ### Salt
 
-The formula was designed to be run in Qubes OS, the normal user name is
-hardcoded to `user` and its home is hardcoded to `/home/user`.
+The formula is part of [Qusal](https://github.com/ben-grande/qusal/issues/43),
+which is designed to work in [Qubes OS](https://www.qubes-os.org/), as such,
+it chooses the first user name in the group `qubes` to place the dotfiles in.
+If you want a machine independent installation, choose the [Script](#script)
+installation method.
 
 Install everything in a qube:
 ```sh
@@ -60,6 +63,7 @@ You can simply deploy all configurations with:
 ```sh
 ./files/setup.sh
 ```
+
 Or target specific ones by specifying the directory name:
 ```sh
 ./files/setup.sh sh bash

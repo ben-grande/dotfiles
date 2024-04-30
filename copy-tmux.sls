@@ -4,18 +4,20 @@ SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
+{%- import "dom0/gui-user.jinja" as gui_user -%}
+
 "{{ slsdotpath }}-copy-tmux-home":
   file.recurse:
-    - name: /home/user/
+    - name: {{ gui_user.gui_user_home }}/
     - source: salt://{{ slsdotpath }}/files/tmux/
     - file_mode: '0644'
     - dir_mode: '0700'
-    - user: user
-    - group: user
+    - user: {{ gui_user.gui_user }}
+    - group: {{ gui_user.gui_user }}
 
 "{{ slsdotpath }}-fix-executables-tmux-home":
   file.directory:
-    - name: /home/user/.local/bin
+    - name: {{ gui_user.gui_user_home }}/.local/bin
     - mode: '0755'
     - recurse:
       - mode
@@ -31,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 "{{ slsdotpath }}-fix-executables-tmux-skel":
   file.directory:
-    - name: /home/user/.local/bin
+    - name: {{ gui_user.gui_user_home }}/.local/bin
     - mode: '0755'
     - recurse:
       - mode

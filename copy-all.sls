@@ -23,6 +23,9 @@ Best option is 'file.managed mode: keep' or 'file.recurse file_mode: keep'.
 https://docs.saltproject.io/en/latest/ref/states/all/salt.states.file.html
 #}
 {#
+
+{%- import "dom0/gui-user.jinja" as gui_user -%}
+
 "{{ slsdotpath }}-absent-dotfiles-client":
   file.absent:
     - name: /tmp/dotfiles
@@ -33,17 +36,17 @@ https://docs.saltproject.io/en/latest/ref/states/all/salt.states.file.html
     - name: /tmp/dotfiles
     - file_mode: '0644'
     - dir_mode: '0700'
-    - user: user
-    - group: user
+    - user: {{ gui_user.gui_user }}
+    - group: {{ gui_user.gui_user }}
 
 "{{ slsdotpath }}-apply-dotfiles-client":
   cmd.run:
     - name: sh /tmp/dotfiles/setup.sh
-    - runas: user
+    - runas: {{ gui_user.gui_user }}
 
 "{{ slsdotpath }}-fix-executables-permission":
   file.directory:
-    - name: /home/user/.local/bin
+    - name: {{ gui_user.gui_user_home }}/.local/bin
     - mode: '0755'
     - recurse:
       - mode

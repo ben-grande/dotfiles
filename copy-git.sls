@@ -4,32 +4,34 @@ SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
+{%- import "dom0/gui-user.jinja" as gui_user -%}
+
 "{{ slsdotpath }}-copy-git-home":
   file.recurse:
-    - name: /home/user
+    - name: {{ gui_user.gui_user_home }}
     - source: salt://{{ slsdotpath }}/files/git
     - file_mode: '0644'
     - dir_mode: '0700'
-    - user: user
-    - group: user
+    - user: {{ gui_user.gui_user }}
+    - group: {{ gui_user.gui_user }}
 
 "{{ slsdotpath }}-fix-executables-git-template-dir-home":
   file.directory:
-    - name: /home/user/.config/git/template/hooks
+    - name: {{ gui_user.gui_user_home }}/.config/git/template/hooks
     - mode: '0755'
     - recurse:
       - mode
 
 "{{ slsdotpath }}-fix-executables-git-shell-dir-home":
   file.directory:
-    - name: /home/user/.config/git/shell
+    - name: {{ gui_user.gui_user_home }}/.config/git/shell
     - mode: '0755'
     - recurse:
       - mode
 
 "{{ slsdotpath }}-fix-executables-git-bin-dir-home":
   file.directory:
-    - name: /home/user/.local/bin
+    - name: {{ gui_user.gui_user_home }}/.local/bin
     - mode: '0755'
     - recurse:
       - mode
@@ -52,14 +54,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 "{{ slsdotpath }}-fix-executables-git-shell-dir-skel":
   file.directory:
-    - name: /home/user/.config/git/shell
+    - name: {{ gui_user.gui_user_home }}/.config/git/shell
     - mode: '0755'
     - recurse:
       - mode
 
 "{{ slsdotpath }}-fix-executables-git-bin-dir-skel":
   file.directory:
-    - name: /home/user/.local/bin
+    - name: {{ gui_user.gui_user_home }}/.local/bin
     - mode: '0755'
     - recurse:
       - mode
