@@ -21,21 +21,21 @@ Ben Grande's Dotfiles.
 
 Configuration and scripts targeting:
 
-- Usability:
-  - Vi keybindings for application movement
-  - Emacs keybindings for command-line editing
-  - XDG Specification to not clutter $HOME
-- Portability:
-  - POSIX compliant code
-  - Drop-in configuration files
-  - Tested in Qubes OS Dom0, Debian, Fedora, OpenBSD
-- Tasks:
-  - GUI: x11, gtk
-  - SCM: git, tig, git-shell
-  - Keys: gpg, ssh
-  - Networking: curl, urlview, wget, w3m
-  - Productivity: tmux, vim
-  - Shell: sh, bash, zsh, less, dircolors
+-   Usability:
+    -   Vi keybindings for application movement
+    -   Emacs keybindings for command-line editing
+    -   XDG Specification to not clutter $HOME
+-   Portability:
+    -   POSIX compliant code
+    -   Drop-in configuration files
+    -   Tested in Qubes OS Dom0, Debian, Fedora, OpenBSD
+-   Tasks:
+    -   GUI: x11, gtk
+    -   SCM: git, tig, git-shell
+    -   Keys: gpg, ssh
+    -   Networking: curl, urlview, wget, w3m
+    -   Productivity: tmux, vim
+    -   Shell: sh, bash, zsh, less, dircolors
 
 ## Installation
 
