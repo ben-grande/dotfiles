@@ -43,8 +43,7 @@
 	aliases = "!sh -c 'if test -n \"$1\"; then git config --get alias.$1; else git config --get-regexp \"alias.*\" | colrm 1 6 | sed \"s/[ ]/ = /\"; fi'" -
 	; Patch with subject prefix containing repository name and output
 	; directory has the child directories the repository and branch name.
-	fp = "!sh -c '\
-		git rev-parse --show-toplevel 2>&1 >/dev/null || return; \
+	fp = "!sh -c 'git rev-parse --show-toplevel 2>&1 >/dev/null || return; \
 		repo=\"$(basename $(git rev-parse --show-toplevel) | \
 			sed s/^qubes-//)\"; \
 		outdir=\"$(git config format.outputDirectory)\"; \
@@ -75,8 +74,7 @@
 	; Submodules.
 	sub-update = !sh -c 'git checkout $1 && git submodule update --recursive'
 	; Signed tags and commits
-	stag = "!sh -c '\
-		commit_id=\"$(git rev-parse --verify \"$@\")\"; \
+	stag = "!sh -c 'commit_id=\"$(git rev-parse --verify \"$@\")\"; \
 		tag_name=\"signed_tag_for_$(echo $commit_id | cut -c 1-8)\"; \
 		git tag -s \"$tag_name\" \
 			-m \"Tag for commit $commit_id\" \"$commit_id\"; \
