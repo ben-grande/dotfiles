@@ -29,6 +29,9 @@ SAVEHIST="$HISTSIZE"
 setopt hist_expire_dups_first # purge dups first
 setopt hist_ignore_dups # ignore dups in history list
 setopt hist_verify # if command has hist expansion, show it before executing
+setopt append_history # append instead of replacing
+setopt share_history # share history across sessions
+setopt no_inc_append_history # conflicts with share_history
 ## - Expansion
 setopt auto_cd
 setopt no_nomatch # if a pattern has no matches print an error
@@ -198,8 +201,8 @@ fi
 ## Load completions.
 autoload -Uz compinit
 zmodload zsh/complist
-mkdir -p $XDG_CACHE_HOME/zsh
-compinit -u -d $XDG_CACHE_HOME/zsh/zcompdump
+mkdir -p "$XDG_CACHE_HOME/zsh"
+compinit -u -d "$XDG_CACHE_HOME/zsh/zcompdump"
 # _comp_options+=(globdots)
 ! has zoxide || eval "$(zoxide init zsh)"
 ! has gitlint || eval "$(_GITLINT_COMPLETE=zsh_source gitlint)"
