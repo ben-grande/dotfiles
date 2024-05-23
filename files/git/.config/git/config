@@ -21,6 +21,8 @@
 	in = init
 	inb = init --bare
 	ci = commit
+	cia = commit --amend
+	cian = commit --amend --no-edit
 	cir = "!sh -c 'file=\"$(git rev-parse --git-dir)/COMMIT_EDITMSG\"; if test -s \"$file\"; then git commit -eF \"$file\" \"$@\"; else git commit \"$@\"; fi'" -
 	lg = !sh -c 'git log --color \"$@\"|fmt -s -w 79|less -FRSX' _
 	lgg = log --graph --pretty='format:%C(yellow)%h%C(reset) %C(magenta)%G?%C(reset) -%C(red)%d%C(reset) %C(reset)%s %C(green)(%cs)%C(reset) %C(blue)%aN%C(reset)'
