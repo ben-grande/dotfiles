@@ -62,7 +62,7 @@ BLOCKSIZE="K"
 RSYNC_RSH="ssh -ax"
 SYSTEMD_PAGER=""
 if test -s /rw/config/gpg-split-domain; then
-  QUBES_GPG_DOMAIN="$(cat /rw/config/gpg-split-domain)"
+  read -r QUBES_GPG_DOMAIN < /rw/config/gpg-split-domain
 else
   QUBES_GPG_DOMAIN="@default"
 fi
@@ -91,7 +91,6 @@ fi
 ## XDG_CONFIG_HOME: user-specific configuration files
 GTK2_RC_FILES="$XDG_CONFIG_HOME/gtk-2.0/gtkrc-2.0"
 KDEHOME="$XDG_CONFIG_HOME/kde"
-#KDEROOTHOME="/root/.config/kde"
 INPUTRC="$BASHDIR/inputrc"
 if has less; then
   lesskey_src=0
@@ -108,7 +107,7 @@ if has less; then
   fi
   unset lesskey_src less_version
 fi
-export GTK2_RC_FILES KDEHOME KDEROOTHOME INPUTRC LESSKEY
+export GTK2_RC_FILES KDEHOME INPUTRC LESSKEY
 
 ## XDG_DATA_HOME: user-specific data files
 RUSTUP_HOME="$XDG_DATA_HOME/rustup"
@@ -130,9 +129,28 @@ GOMODCACHE="$XDG_CACHE_HOME/go/mod"
 export GOCACHE GOMODCACHE
 
 ## Start agents
+ssh_agent_dir="$TMPDIR/ssh-agent-$USER"
+ssh_agent_sock="$ssh_agent_dir/agent.sock"
+ssh_agent_pid="$ssh_agent_dir/agent.pid"
 if test -z "${SSH_AUTH_SOCK-}" && has ssh-agent; then
-  eval "$(ssh-agent -s)" >/dev/null
+  test -d "$ssh_agent_dir" || mkdir -p "$ssh_agent_dir"
+  if test -S "$ssh_agent_sock" &&
+    test -r "$ssh_agent_sock" &&
+    test -w "$ssh_agent_sock" &&
+    test -f "$ssh_agent_pid" &&
+    test -r "$ssh_agent_pid" &&
+    test -s "$ssh_agent_pid"
+  then
+    SSH_AUTH_SOCK="$ssh_agent_sock"
+    read -r SSH_AGENT_PID < "$ssh_agent_pid"
+    export SSH_AUTH_SOCK SSH_AGENT_PID
+  else
+    rm -f "$ssh_agent_sock" "$ssh_agent_pid"
+    eval "$(ssh-agent -s -a "$ssh_agent_sock")" >/dev/null
+    echo "$SSH_AGENT_PID" | tee "$ssh_agent_pid" >/dev/null
+  fi
 fi
+unset ssh_agent_dir ssh_agent_sock ssh_agent_pid
 
 ## Zsh sources this shell profile before no_nomatch is set in zshrc, thus
 ## fails with "no matches found" when the glob can't be expanded.
