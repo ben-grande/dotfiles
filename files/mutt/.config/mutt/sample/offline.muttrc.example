@@ -1,9 +1,5 @@
 ## Copy to ~/.config/mutt/offline.muttrc and modify.
 
-## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
-##
-## SPDX-License-Identifier: AGPL-3.0-or-later
-
 set read_only     = yes
 
 unset spoolfile
