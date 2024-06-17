@@ -94,9 +94,10 @@ has yt-dlp && alias yt="yt-dlp --add-metadata -ic"
 has fdfind && alias fd="fdfind"
 has lynx && alias lynx="lynx -vikeys"
 has qubesctl && {
-  alias qubesctl="sudo qubesctl --show-output"
   alias qctl="qubesctl"
+  alias qctls="qctl state.apply"
   alias qctlu="qctl --skip-dom0 --targets"
+  qctlus(){ test -n "${2-}" || return 1; qubesctl "${1}" state.apply "${2}"; }
 }
 has gpg && alias gpgs="gpg --show-keys"
 ## {{{ Tmux
