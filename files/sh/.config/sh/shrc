@@ -97,7 +97,10 @@ has qubesctl && {
   alias qctl="qubesctl"
   alias qctls="qctl state.apply"
   alias qctlu="qctl --skip-dom0 --targets"
-  qctlus(){ test -n "${2-}" || return 1; qubesctl "${1}" state.apply "${2}"; }
+  qctlus(){
+    test -n "${2-}" || return 1
+    qubesctl --skip-dom0 --targets "${1}" state.apply "${2}"
+  }
 }
 has gpg && alias gpgs="gpg --show-keys"
 ## {{{ Tmux
