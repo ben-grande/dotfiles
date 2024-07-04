@@ -1,12 +1,12 @@
 <!--
-SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 
 SPDX-License-Identifier: CC-BY-SA-4.0
 -->
 
 # dotfiles
 
-Ben Grande's Dotfiles.
+Dotfiles.
 
 ## Table of Contents
 
