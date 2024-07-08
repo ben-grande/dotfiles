@@ -510,6 +510,7 @@ autocmd FileType vim setlocal keywordprg=:help |
       \ if &foldmethod !=# 'diff' | setlocal foldmethod=expr foldlevel=1 |
       \ endif | setlocal foldexpr=getline(v:lnum)=~'^\"\ Section:'?'>1':'='
 
+autocmd BufRead,BufNewFile .ecrc setlocal filetype=json
 autocmd BufRead,BufNewFile .{yamllint,salt-lint} setlocal filetype=yaml
 autocmd BufRead,BufNewFile .qubesbuilder,/etc/qubes/backup/*.conf
       \ setlocal filetype=yaml
