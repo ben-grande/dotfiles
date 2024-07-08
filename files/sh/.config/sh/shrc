@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## SPDX-FileCopyrightText: 2004 - 2022 Tim Pope <https://tpo.pe>
-## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -39,7 +39,7 @@ if has lsblk; then
   alias lsblku='lsblk -o $_lsblk_options,UUID,PARTUUID'
 fi
 if ! grep --color 2>&1 | grep -qE "(unrecognized|unknown) option" &&
-   ! grep --exclude 2>&1 | grep -qE "(unrecognized|unknown) option"
+  ! grep --exclude 2>&1 | grep -qE "(unrecognized|unknown) option"
 then
   alias grep="grep --exclude='.*.swp' --exclude='*~' --color=auto"
 fi
@@ -127,7 +127,7 @@ fi
 ## }}}
 ## {{{ Git
 if { ! test -f /usr/share/whonix/marker && has git; } ||
-   { test -f /usr/share/whonix/marker && git -v >/dev/null 2>&1; }
+  { test -f /usr/share/whonix/marker && git -v >/dev/null 2>&1; }
 then
   ## Whonix UWT wrapper circumvents the command existence check.
   alias g="git"

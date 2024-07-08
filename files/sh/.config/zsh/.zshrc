@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 ## SPDX-FileCopyrightText: 2004 - 2022 Tim Pope <https://tpo.pe>
-## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -158,7 +158,7 @@ zstyle ':completion:*' squeeze-slashes true
 zstyle ':completion:*' use-compctl true
 zstyle ':completion:*' verbose true
 zstyle ':completion:*:*:-command-:*:*' file-patterns \
- '*(#q-*):executables:Executables *(-/):directories:Directories'
+  '*(#q-*):executables:Executables *(-/):directories:Directories'
 zstyle -e ':completion:*:*:-command-:*:*' tag-order '
   reply=("
     executables:Executables:Executables

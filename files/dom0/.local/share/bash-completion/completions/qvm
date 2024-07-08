@@ -147,7 +147,7 @@ complete -F _qvmcmd-runtrans qvm-kill
 # complete n>=2 arguments with filenames
 _qvmcmd-any_state-filenames() {
   if [ "$(_get-cword-pos "${COMP_CWORD}")" = 1 ]; then
-     _complete-qubes "any_state"
+    _complete-qubes "any_state"
   else
     _complete-filenames
   fi

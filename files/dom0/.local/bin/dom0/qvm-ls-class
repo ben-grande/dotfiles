@@ -13,12 +13,14 @@ case "${1-}" in
   -d|--disp) class="DispVM";;
   -s|--standalone) class="StandaloneVM";;
   "") true;;
-  *) printf '%s\n' "usage: ${0##*/} [CLASS]
+  *) # editorconfig-checker-disable
+    printf '%s\n' "usage: ${0##*/} [CLASS]
  -A, --admin
  -t, --template
  -a, --app
  -d, --disp
  -s, --standalone"
+    # editorconfig-checker-enable
     exit 1
     ;;
 esac

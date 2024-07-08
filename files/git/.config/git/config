@@ -9,7 +9,7 @@
 
 [alias]
 	; https://git.wiki.kernel.org/index.php/Aliases
-        ; https://github.com/schacon/gitscm/tree/master
+	; https://github.com/schacon/gitscm/tree/master
 	; Abbreviations
 	co = checkout
 	br = branch

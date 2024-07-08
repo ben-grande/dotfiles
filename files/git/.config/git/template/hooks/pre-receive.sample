@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+# SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -89,8 +89,8 @@ check_signed_push_keyring(){
   done
 
   gpg_out="$("$gpg" --status-fd=1 --no-default-keyring \
-             --homedir "${GIT_PUSH_CERT_PGPHOMEDIR}" \
-             --verify "$cert_sig" "$cert_msg" 2>&1)"
+              --homedir "${GIT_PUSH_CERT_PGPHOMEDIR}" \
+              --verify "$cert_sig" "$cert_msg" 2>&1)"
   gpg_ec="$?"
   gpg_sig="$(echo "$gpg_out" | awk '/ GOODSIG /{print $3}')"
   if test "$gpg_ec" = "0"; then
