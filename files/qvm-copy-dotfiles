@@ -6,7 +6,7 @@
 ##
 ## Benefits of this method:
 ## - faster than salt, no need for a dispvm.
-## - preserve permisions, salt-ssh doesnt.
+## - preserve permissions, salt-ssh doesn't.
 ## Disadvantages:
 ## - files need be copied to dom0 preserving permissions or setting again.
 ##

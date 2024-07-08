@@ -24,7 +24,7 @@ if ! command -v qubesdb-read >/dev/null || test "$(hostname)" = "dom0"; then
 
   ## Give Caps Lock a better use.
   ## ctrl:swapcaps seems better than caps:swapescape because ctrl is
-  ## difficult to reach and escape can be done wit 'caps+['.
+  ## difficult to reach and escape can be done with 'caps+['.
   setxkbmap -keycodes "evdev+aliases(qwerty)" -model pc105 -layout us \
     -variant ,qwerty -option "" -option "grp:win_space_toggle,ctrl:nocaps"
 
