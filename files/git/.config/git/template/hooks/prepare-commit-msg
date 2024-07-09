@@ -25,8 +25,8 @@ fi
 
 ## Remove the default instructional message and its following empty line.
 sed -i'' \
-  -e "/^. Please enter the commit message for your changes. Lines starting$/d" \
-  -e "/^. with '.' will be ignored, and an empty message aborts the commit.$/ {
+  -e "/^. Please enter the commit message .*. Lines starting$/d" \
+  -e "/^. with '.' will be ignored, .* aborts the commit.$/ {
       N; d; }" \
   "$file"
 

@@ -20,7 +20,9 @@ if test "${#}" -eq 0; then
   term_file_wanted="ttyUSB ttyS"
   ## Consoles are desired.
   if test -r /sys/class/tty/console/active; then
-    term_file_wanted="${term_file_wanted} $(cat /sys/class/tty/console/active)"
+    active_console="$(cat /sys/class/tty/console/active)"
+    term_file_wanted="${term_file_wanted} ${active_console}"
+    unset active_console
   fi
   term_file_active=0
   for tf in $(printf %s"${term_file_wanted}"); do

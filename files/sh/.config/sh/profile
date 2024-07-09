@@ -7,7 +7,8 @@
 ## Not so invasive because it only assigns a value if it is empty.
 : "${HOME:=$(cd ~ && pwd)}"
 : "${USER:=$(id -un || printf %s "${HOME##*/}")}"
-: "${UID:=$(id -u || awk -F':' -v user="$USER" '/^user:/{print $3}' /etc/passwd)}"
+: "${UID:=$(id -u || awk -F ":" -v user="$USER" '/^user:/{print $3}' \
+  /etc/passwd)}"
 : "${HOSTNAME:=$(hostname)}"
 export HOME USER UID HOSTNAME
 
@@ -17,7 +18,8 @@ XDG_CACHE_HOME="$HOME/.cache"
 XDG_DATA_HOME="$HOME/.local/share"
 XDG_STATE_HOME="$HOME/.local/state"
 export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME
-mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"
+mkdir -p \
+  "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"
 ## Set XDG_*_DIR variables.
 eval "$(grep "^[ ]*XDG_[A-Z].*_DIR=" "$XDG_CONFIG_HOME/user-dirs.dirs" |
         sed "s/^/export /")"

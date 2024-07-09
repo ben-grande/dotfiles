@@ -12,9 +12,9 @@
 ## - editing the "panel" and adding "keyboard layouts" plugin. After adding
 ##   the plugin, right click on it and edit its properties. Set "manage
 ##   layout" to globally.
-## - editing the plugin directly in the "settings editor", search for plugin-n,
-##   where "n" is a number we don't know and its value is "kxb", search for
-##   group-policy and set it to "0".
+## - editing the plugin directly in the "settings editor", search for
+##   plugin-n, where "n" is a number we don't know and its value is "kxb",
+##   search for group-policy and set it to "0".
 ## - editing the plugin values via commandline with "xfconf" and set
 ##   "group-policy" value to "0".
 set -eu

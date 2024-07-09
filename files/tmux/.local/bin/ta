@@ -37,7 +37,8 @@ ta_new(){
 main(){
   if test -n "$TMUX"; then
     ## Inside tmux.
-    if test -n "$ta_session" && tmux has-session -t "$ta_session" >/dev/null 2>&1; then
+    if test "$ta_session" && tmux has-session -t "$ta_session" >/dev/null 2>&1
+    then
       ## Session name was specified and it exists.
       tmux switch-client -t "$ta_session"
       tmux display-message "Switched to session $ta_session"
@@ -93,7 +94,8 @@ main(){
       return 0
     fi
 
-    if test -n "$ta_session" && tmux has-session -t "$ta_session" >/dev/null 2>&1; then
+    if test "$ta_session" && tmux has-session -t "$ta_session" >/dev/null 2>&1
+    then
       ## Session name was specified and it exists.
       tmux attach-session -t "$ta_session"
       tmux display-message "Attached to session $ta_session"

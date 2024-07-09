@@ -34,7 +34,8 @@ fi
 
 # shellcheck disable=SC2016
 print_bare='
-  test "$(git -C "$1" rev-parse --is-bare-repository)" = true && printf "%s\n" "${1}"
+  test "$(git -C "$1" rev-parse --is-bare-repository)" = true &&
+    printf "%s\n" "${1}"
 '
 
 # shellcheck disable=SC2154

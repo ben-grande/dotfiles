@@ -72,12 +72,16 @@ alias reload="exec zsh"
 newline=$'\n'
 if test "${color_prompt-}" = "yes"; then
   autoload -U colors && colors
-  [[ "${COLORTERM-}" == (24bit|truecolor) || "${terminfo[colors]}" -eq '16777216' ]] || zmodload zsh/nearcolor
+  [[ "${COLORTERM-}" == (24bit|truecolor) ||
+    "${terminfo[colors]}" -eq '16777216' ]] || zmodload zsh/nearcolor
 
-  PS1="\$(resize-terminal)%F{magenta}[%{$usercolor%}%n@%m%F{reset_color%} %{$dircolor%}%50<...<%~%<<%F{reset_color%}\$(_git_prompt_info)%F{magenta}]%F{reset_color}${newline-}${ps1_symbol} "
+  PS1="\$(resize-terminal)%F{magenta}[%{$usercolor%}%n@%m%F{reset_color%}"
+  PS1="${PS1} %{$dircolor%}%50<...<%~%<<%F{reset_color%}\$(_git_prompt_info)"
+  PS1="${PS1}%F{magenta}]%F{reset_color}${newline-}${ps1_symbol} "
   RPS1="%(?..(%{"$'\e[31m'"%}%?%{$reset_color%}%)%<<)"
 else
-  PS1="\$(resize-terminal)[%n@%M %~\$(_git_prompt_info)]${newline}${ps1_symbol} "
+  PS1="\$(resize-terminal)[%n@%M %~\$(_git_prompt_info)]${newline}"
+  PS1="${PS1}${ps1_symbol} "
   RPS1="%(?..(%?%)%<<)"
 fi
 
@@ -138,7 +142,8 @@ unset newline
 
 ## Enable completion.
 zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}"/zsh/zcompcache
+zstyle ':completion:*' cache-path \
+  "${XDG_CACHE_HOME:-$HOME/.cache}"/zsh/zcompcache
 zstyle ':completion:*' auto-description 'Specify: %d'
 zstyle ':completion:*' completer _expand _complete _ignored _approximate
 zstyle ':completion:*' expand prefix suffix
@@ -146,13 +151,17 @@ zstyle ':completion:*' file-sort name
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' ignore-parents parent pwd ..
 zstyle ':completion:*' insert-unambiguous true
-zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+zstyle ':completion:*' list-prompt \
+  %SAt %p: Hit TAB for more, or the character to insert%s
 zstyle ':completion:*' list-suffixes true
-zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|[._-]=** r:|=**' 'l:|=* r:|=*'
+zstyle ':completion:*' matcher-list '' \
+  'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' \
+  'r:|[._-]=** r:|=**' 'l:|=* r:|=*'
 zstyle ':completion:*' menu select=1
 zstyle ':completion:*' original true
 zstyle ':completion:*' preserve-prefix '//[^/]##/'
-zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+zstyle ':completion:*' select-prompt \
+  %SScrolling active: current selection at %p%s
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' squeeze-slashes true
 zstyle ':completion:*' use-compctl true
@@ -185,14 +194,15 @@ zstyle ':completion:*:doas::' environ \
 if test "${color_prompt-}" = "yes"; then
   zstyle ':completion:*:*:*:*:descriptions' format '%B%F{blue}-- %d --%b%f'
   zstyle ':completion:*:messages' format ' %B%F{purple} -- %d --%f%b'
-  zstyle ':completion:*:warnings' format ' %B%F{red}-- no matches found --%f%b'
+  zstyle ':completion:*:warnings' format ' %B%F{red}-- no matches --%f%b'
 
   zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-  zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=94=91=93'
+  zstyle ':completion:*:*:kill:*' list-colors \
+    '=(#b) #([0-9]#)*( *[a-z])*=94=91=93'
 else
   zstyle ':completion:*:*:*:*:descriptions' format '-- %d --%b%f'
   zstyle ':completion:*:messages' format ' -- %d --%f%b'
-  zstyle ':completion:*:warnings' format ' -- no matches found --%f%b'
+  zstyle ':completion:*:warnings' format ' -- no matches --%f%b'
 
   zstyle ':completion:*:default' list-colors ''
   zstyle ':completion:*:*:kill:*' list-colors ''
@@ -221,7 +231,8 @@ if test "${color_prompt-}" = "yes"; then
     source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
   fi
   ## Highlight commands as you type
-  if test -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh; then
+  if test -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  then
     ## https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters
     ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern regexp)
     typeset -A ZSH_HIGHLIGHT_STYLES
@@ -423,7 +434,8 @@ bindkey-multi emacs viins vicmd -- "\E[1~" "\E[7~" "\E[H" "\EOH" \
 bindkey-multi emacs viins vicmd -- "\E[2~" "\E[L" "${terminfo[kich1]}" \
   -- overwrite-mode
 ## Delete
-bindkey-multi emacs viins vicmd -- "\E[3~" "\E[P" "\EOP" "${terminfo[kdch1]}" \
+bindkey-multi emacs viins vicmd -- "\E[3~" "\E[P" "\EOP" \
+  "${terminfo[kdch1]}" \
   -- vi-delete-char
 ## End
 bindkey-multi emacs viins vicmd -- "\E[4~" "\E[8~" "\E[F" "\EOF" \
@@ -442,7 +454,8 @@ bindkey-multi emacs viins vicmd -- "\E[A" "\EOA" "${terminfo[kcuu1]}" \
 bindkey-multi emacs viins vicmd -- "\E[B" "\EOB" "${terminfo[kcud1]}" \
   -- down-line-or-history
 ## Right arrow
-bindkey-multi emacs viins vicmd -- "\E[1C" "\E[C" "\EOC" "${terminfo[kcuf1]}" \
+bindkey-multi emacs viins vicmd -- "\E[1C" "\E[C" "\EOC" \
+  "${terminfo[kcuf1]}" \
   -- forward-char
 ## Left arrow
 bindkey-multi emacs viins vicmd -- "\E[D" "\EOD" "${terminfo[kcub1]}" \
