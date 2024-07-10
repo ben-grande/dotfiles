@@ -4,7 +4,7 @@
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
-: "${XDG_CONFIG_HOME:=$HOME/.config}"
+: "${XDG_CONFIG_HOME:=${HOME}/.config}"
 
-XINITRC="$XDG_CONFIG_HOME/x11/xinitrc"
+XINITRC="${XDG_CONFIG_HOME}/x11/xinitrc"
 export XINITRC

@@ -5,5 +5,5 @@
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
 # shellcheck disable=SC1090,SC1091
-test -r "$HOME/.profile" && . "$HOME/.profile"
-. "${XDG_CONFIG_HOME:=$HOME/.config}/x11/xsession"
+test -r "${HOME}/.profile" && . "${HOME}/.profile"
+. "${XDG_CONFIG_HOME:=${HOME}/.config}/x11/xsession"

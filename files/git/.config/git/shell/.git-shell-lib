@@ -6,7 +6,7 @@
 
 set -eu
 
-## Guarantee commands are run from $HOME
+## Guarantee commands are run from ${HOME}
 cd
 
 # shellcheck disable=SC2034
@@ -25,35 +25,35 @@ fail_invalid_name(){
 test_description(){
   key="$1"
   value="$2"
-  if ! (echo "$value" | grep -E -q "${description_regex}"); then
-    fail_invalid_name "$key"
+  if ! (echo "${value}" | grep -E -q "${description_regex}"); then
+    fail_invalid_name "${key}"
   fi
 }
 
 test_name(){
   key="$1"
   value="$2"
-  if ! (echo "$value" | grep -E -q "${regex}"); then
-    fail_invalid_name "$key"
+  if ! (echo "${value}" | grep -E -q "${regex}"); then
+    fail_invalid_name "${key}"
   fi
 }
 
 clean_repo_name(){
   case "${repo-}" in
     *.git) repo="";;
-    *) repo="$repo.git";;
+    *) repo="${repo}.git";;
   esac
 }
 
 is_bare(){
   _repo="$1"
-  if ! test -d "$_repo"; then
-    echo "Repository doesn't exist: $_repo" >&2
+  if ! test -d "${_repo}"; then
+    echo "Repository doesn't exist: ${_repo}" >&2
     return 1
   fi
-  if ! test "$(git -C "$_repo" rev-parse --is-bare-repository)" = "true"
-  then
-    echo "Repository is not bare: $_repo" >&2
+  bare_repo_check="$(git -C "${_repo}" rev-parse --is-bare-repository)"
+  if ! test "${bare_repo_check}" = "true"; then
+    echo "Repository is not bare: ${_repo}" >&2
     return 1
   fi
 }

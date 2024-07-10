@@ -1,12 +1,13 @@
 #!/bin/sh
 
-## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
 ## Check if we are root, fail otherwise.
 set -eu
 
-test "$(id -u)" -eq 0 && exit 0
+uid="$(id -u)"
+test "${uid}" -eq 0 && exit 0
 printf '%s\n' "Permission denied, action requires privileges."
 exit 1

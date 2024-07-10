@@ -20,4 +20,4 @@
 set -eu
 
 xkb_plugin="$(xfconf-query -v -c xfce4-panel -p /plugins -l | grep xkb)"
-xfconf-query -c xfce4-panel -p "$xkb_plugin/group-policy" -n -s 0
+xfconf-query -c xfce4-panel -p "${xkb_plugin}/group-policy" -n -s 0

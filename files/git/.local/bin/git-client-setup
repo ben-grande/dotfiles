@@ -7,8 +7,8 @@
 ## Setup git client on new machine on a local/separate git configuration.
 set -eu
 
-gitconfig_file="$HOME/.gitconfig.local"
-signature_file="$HOME/.signature"
+gitconfig_file="${HOME}/.gitconfig.local"
+signature_file="${HOME}/.signature"
 vim_modeline="vim: ft=gitconfig"
 
 usage(){
@@ -30,20 +30,20 @@ email="$2"
 signingkey="$3"
 
 set_git_config(){
-  git config --file "$gitconfig_file" "$1" "$2"
+  git config --file "${gitconfig_file}" "$1" "$2"
 }
 
-set_git_config user.name "$user"
-set_git_config user.email "$email"
-set_git_config user.signingKey "$signingkey"
+set_git_config user.name "${user}"
+set_git_config user.email "${email}"
+set_git_config user.signingKey "${signingkey}"
 
-if test -s "$signature_file"; then
-  set_git_config format.signatureFile "$signature_file"
+if test -s "${signature_file}"; then
+  set_git_config format.signatureFile "${signature_file}"
 else
-  set_git_config format.signature "$user"
+  set_git_config format.signature "${user}"
 fi
 
 grep \
   -E "^;*\s+(vim:.*(\s+|:)|vim:(\s*))(ft|filetype)=gitconfig((\s+|:).*|$)" \
-  -q "$gitconfig_file" ||
-  sed -i'' "1i; $vim_modeline" "$gitconfig_file"
+  -q "${gitconfig_file}" ||
+  sed -i'' "1i; ${vim_modeline}" "${gitconfig_file}"

@@ -6,5 +6,8 @@
 
 # shellcheck disable=SC1090,1091
 
-. "$HOME/.profile"
-case $- in *i*) . "$HOME/.bashrc";; esac
+. "${HOME}/.profile"
+case $- in
+  *i*) . "${HOME}/.bashrc";;
+  *) ;;
+esac

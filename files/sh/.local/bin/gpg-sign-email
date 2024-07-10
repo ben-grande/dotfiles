@@ -33,15 +33,15 @@ if test -z "${1-}"; then
 fi
 
 vi_cmd="$(has -s vim vi)"
-if test -z "$vi_cmd"; then
+if test -z "${vi_cmd}"; then
   printf '%s\n' "Please install 'vi(m)'."
   exit 1
 fi
 
 for f in "${@}"; do
-  cp "$f" "$f.asc"
-  "$vi_cmd" -u NONE \
+  cp "${f}" "${f}.asc"
+  "${vi_cmd}" -u NONE \
     -c 'set nomodeline' -c 'norm gg}j' \
     -c '.,$!gpg -a --clear-sign' \
-    -c 'wq' -- "$f.asc"
+    -c 'wq' -- "${f}.asc"
 done

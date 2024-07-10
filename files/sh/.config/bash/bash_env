@@ -7,9 +7,9 @@
 
 # shellcheck disable=SC1090,SC1091
 
-if test -z "$ENV" && test -n "$PATH"; then
+if test -z "${ENV}" && test -n "${PATH}"; then
   case $- in
     *l*) ;;
-      *) . "$HOME/.bash_profile" >/dev/null ;;
+      *) . "${HOME}/.bash_profile" >/dev/null ;;
   esac
 fi

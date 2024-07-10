@@ -8,7 +8,7 @@ set -eu
 
 command -v tmux >/dev/null || exit 1
 : "${TMUX:=}"
-ta_session="${1:-}"
+session="${1:-}"
 
 ## Attach to session if it exists or not and from inside tmux or not.
 ## If name is supplied and doesn't exist, create session with given name.
@@ -16,120 +16,120 @@ ta_session="${1:-}"
 ## else ask for the user to choose the wanted session.
 ## usage: ta SESSION ARGS
 ## example: ta dotfiles -d
-ta_new(){
+new(){
   ## Session name was not specified.
-  ta_list="$(tmux list-sessions 2>/dev/null)"
+  list="$(tmux list-sessions 2>/dev/null)"
 
   printf "Choose session or create one by providing a new name:\n"
-  if test -n "$ta_list"; then
-    printf %s"\n${ta_list}\n"
+  if test -n "${list}"; then
+    printf %s"\n${list}\n"
   fi
 
   printf "\nEnter session name: "
-  read -r ta_name
+  read -r name
 
-  if test -z "$ta_name"; then
+  if test -z "${name}"; then
     printf "Name cannot be empty.\n"
     return 1
   fi
 }
 
 main(){
-  if test -n "$TMUX"; then
+  if test -n "${TMUX}"; then
     ## Inside tmux.
-    if test "$ta_session" && tmux has-session -t "$ta_session" >/dev/null 2>&1
+    if test "${session}" && tmux has-session -t "${session}" >/dev/null 2>&1
     then
       ## Session name was specified and it exists.
-      tmux switch-client -t "$ta_session"
-      tmux display-message "Switched to session $ta_session"
+      tmux switch-client -t "${session}"
+      tmux display-message "Switched to session ${session}"
 
-    elif test -n "$ta_session"; then
+    elif test -n "${session}"; then
       ## Session name was specified but it doesn't exist.
-      tmux new-session -d -s "$ta_session"
-      tmux switch-client -t "$ta_session"
-      tmux display-message "Created and switched to session $ta_session"
+      tmux new-session -d -s "${session}"
+      tmux switch-client -t "${session}"
+      tmux display-message "Created and switched to session ${session}"
 
     else
 
       ## Session name was not specified.
-      ta_last="$(tmux display-message -p "#{client_last_session}")"
-      if test -n "$ta_last" && tmux has-session -t "$ta_last"; then
+      last="$(tmux display-message -p "#{client_last_session}")"
+      if test -n "${last}" && tmux has-session -t "${last}"; then
         ## If tmux has a last session, use it.
-        tmux switch-client -t "$ta_last"
-        tmux display-message "Switched to session $ta_last"
+        tmux switch-client -t "${last}"
+        tmux display-message "Switched to session ${last}"
 
       else
 
         ## No last session, choose one or create one.
         printf "Last session not found.\n"
-        ta_new || return 1
+        new
 
-        if tmux has-session -t "$ta_name" 2>/dev/null; then
+        if tmux has-session -t "${name}" 2>/dev/null; then
           ## Chosen session exists.
-          tmux switch-client -t "$ta_name"
-          tmux display-message "Switched to session $ta_name"
+          tmux switch-client -t "${name}"
+          tmux display-message "Switched to session ${name}"
 
         else
           ## Chosen session doesn't exist.
-          tmux new-session -d -s "$ta_name"
-          tmux switch-client -t "$ta_name"
-          tmux display-message "Created and switched to session $ta_name"
+          tmux new-session -d -s "${name}"
+          tmux switch-client -t "${name}"
+          tmux display-message "Created and switched to session ${name}"
         fi
       fi
     fi
   else
 
     ## Outside of tmux.
-    if test -n "$ta_session" && ! tmux list-sessions >/dev/null 2>&1; then
+    if test -n "${session}" && ! tmux list-sessions >/dev/null 2>&1; then
       ## Session name was specified but server is not running.
-      tmux new-session -s "$ta_session"
-      tmux display-message "Created session $ta_session"
+      tmux new-session -s "${session}"
+      tmux display-message "Created session ${session}"
       return 0
 
     elif ! tmux list-sessions >/dev/null 2>&1; then
       ## Server is not running.
-      ta_new || return 1
-      tmux new-session -s "$ta_name"
-      tmux display-message "Created session $ta_name"
+      new
+      tmux new-session -s "${name}"
+      tmux display-message "Created session ${name}"
       return 0
     fi
 
-    if test "$ta_session" && tmux has-session -t "$ta_session" >/dev/null 2>&1
+    if test "${session}" && tmux has-session -t "${session}" >/dev/null 2>&1
     then
       ## Session name was specified and it exists.
-      tmux attach-session -t "$ta_session"
-      tmux display-message "Attached to session $ta_session"
+      tmux attach-session -t "${session}"
+      tmux display-message "Attached to session ${session}"
 
-    elif test -n "$ta_session"; then
+    elif test -n "${session}"; then
       ## Session name was specified but it doesn't exist.
-      tmux new-session -s "$ta_session"
-      tmux display-message "Created new session $ta_session"
+      tmux new-session -s "${session}"
+      tmux display-message "Created new session ${session}"
 
     else
       ## Session name was not specified.
-      ta_last="$(tmux display-message -p "#{session_name}")"
+      last="$(tmux display-message -p "#{session_name}")"
 
-      if test -n "$ta_last" && tmux has-session -t "$ta_last"; then
+      if test -n "${last}" && tmux has-session -t "${last}"; then
         ## If tmux has a session name, use it.
-        tmux attach-session -t "$ta_last"
-        tmux display-message "Attached to session $ta_last"
+        tmux attach-session -t "${last}"
+        tmux display-message "Attached to session ${last}"
 
       else
-        ta_new || return 1
+        new
 
-        if tmux has-session -t "$ta_name" 2>/dev/null; then
+        if tmux has-session -t "${name}" 2>/dev/null; then
           ## Chosen session exists.
-          tmux attach-session -t "$ta_name"
-          tmux display-message "Attached to session $ta_name"
+          tmux attach-session -t "${name}"
+          tmux display-message "Attached to session ${name}"
 
         else
           ## Chosen session doesn't exist.
-          tmux new-session -s "$ta_name"
-          tmux display-message "Created session $ta_name"
+          tmux new-session -s "${name}"
+          tmux display-message "Created session ${name}"
         fi
       fi
     fi
   fi
 }
 
-main "$@"
+main "${@}"

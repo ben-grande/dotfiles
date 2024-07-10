@@ -13,29 +13,29 @@ usage(){
   # shellcheck disable=2154
   echo "usage: ${0##*/} SECTION REPOSITORY [DESCRIPTION]
 note: prints the current description if none description is specified.:w
-regex: $regex" >&2
+regex: ${regex}" >&2
   exit 1
 }
 
 test -n "${2-}" || usage
 section="$1"
-test_name section "$section"
+test_name section "${section}"
 repo="$2"
-test_name repo "$repo"
+test_name repo "${repo}"
 clean_repo_name
 
 # shellcheck disable=SC2154
-is_bare "$base/$section/$repo"
+is_bare "${base}/${section}/${repo}"
 
-description_file="$base/$section/$repo/description"
+description_file="${base}/${section}/${repo}/description"
 
 if test -z "${3-}"; then
-  test -f "$description_file" || touch "$description_file"
-  cat "$description_file"
+  test -f "${description_file}" || touch "${description_file}"
+  cat "${description_file}"
   exit 0
 fi
 
 description="$(echo "$3" | cut -c 1-80)"
-test_description description "$description"
+test_description description "${description}"
 
-echo "$description" | tee "$description_file"
+echo "${description}" | tee "${description_file}"

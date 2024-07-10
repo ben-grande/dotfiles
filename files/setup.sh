@@ -7,15 +7,15 @@
 set -eu
 
 prg="$0"
-if ! test -e "$prg"; then
-  case "$prg" in
+if ! test -e "${prg}"; then
+  case "${prg}" in
     (*/*) exit 1;;
-    (*) prg=$(command -v -- "$prg") || exit;;
+    (*) prg=$(command -v -- "${prg}") || exit;;
   esac
 fi
-dir="$(cd -P -- "$(dirname -- "$prg")" && pwd -P)" || exit 1
-prg="$dir/$(basename -- "$prg")" || exit 1
-cd -- "$dir" || exit 1
+dir="$(cd -P -- "$(dirname -- "${prg}")" && pwd -P)" || exit 1
+prg="${dir}/$(basename -- "${prg}")" || exit 1
+cd -- "${dir}" || exit 1
 
 usage(){
   printf '%s\n' "Usage: ${0##*/} [-h|--help] DIR [DIR2...]"
@@ -29,17 +29,23 @@ case "${1-}" in
   *) args="${*}";;
 esac
 
-for dir in $args; do
-  case "${dir##*/}" in "."|"..") continue;; esac
+for dir in ${args}; do
+  case "${dir##*/}" in
+    "."|"..") continue;;
+    *) ;;
+  esac
   dir="${dir%*/}"
-  test -f "$dir" && continue
-  if ! test -d "$dir"; then
-    printf '%s\n' "Directory doesn't exist: '$dir'." >&2
+  test -f "${dir}" && continue
+  if ! test -d "${dir}"; then
+    printf '%s\n' "Directory doesn't exist: '${dir}'." >&2
     exit 1
   fi
-  for file in "$dir"/.*; do
-    test -e "$file" || continue
-    case "${file##*/}" in "."|"..") continue;; esac
-    cp -rv "$file" "$HOME"
+  for file in "${dir}"/.*; do
+    test -e "${file}" || continue
+    case "${file##*/}" in
+      "."|"..") continue;;
+      *) ;;
+    esac
+    cp -rv "${file}" "${HOME}"
   done
 done

@@ -16,7 +16,7 @@ esac
 
 ## Source profile.
 # shellcheck disable=SC1091
-. "$HOME/.profile"
+. "${HOME}/.profile"
 ## }}}
 ## {{{ Options
 stty -ixon
@@ -27,7 +27,7 @@ stty werase undef
 ## }}}
 ## {{{ Alias
 ## Standard commands.
-test -n "$VISUAL" && alias vi='$VISUAL'
+test -n "${VISUAL-}" && alias vi='${VISUAL}'
 alias du="du -h"
 alias df="df -h"
 alias cp="cp -i"
@@ -35,8 +35,8 @@ alias mv="mv -i"
 alias ls="ls -hF --group-directories-first --color=auto"
 if has lsblk; then
   _lsblk_options="NAME,FSTYPE,LABEL,SIZE,FSAVAIL,FSUSE%,MOUNTPOINT"
-  alias lsblk='lsblk -o $_lsblk_options'
-  alias lsblku='lsblk -o $_lsblk_options,UUID,PARTUUID'
+  alias lsblk='lsblk -o ${_lsblk_options}'
+  alias lsblku='lsblk -o ${_lsblk_options},UUID,PARTUUID'
 fi
 if ! grep --color 2>&1 | grep -qE "(unrecognized|unknown) option" &&
   ! grep --exclude 2>&1 | grep -qE "(unrecognized|unknown) option"
@@ -53,23 +53,34 @@ has highlight && alias highlight="highlight --out-format=ansi"
 has pygmentize && alias pygmentize="pygmentize -f terminal"
 
 ## Helpers.
-alias reload='. $ENV' r="reload"
-alias reload-xprofile='. $XDG_CONFIG_HOME/x11/xprofile' rx="reload-xprofile"
+alias reload='. ${ENV}' r="reload"
+if test -f "${XDG_CONFIG_HOME:-${HOME}/.config}/x11/xprofile"; then
+  alias reload-xprofile='. ${XDG_CONFIG_HOME:-${HOME}/.config}/x11/xprofile'
+  alias rx="reload-xprofile"
+fi
 cd_up(){
   # SPDX-FileCopyrightText: 2014 Grigory K <https://stackoverflow.com/users/2937875/grigory-k>
   # SPDX-License-Identifier: CC-BY-SA-3.0
   # Credits: https://stackoverflow.com/a/26134858
   case "${1-}" in
-    [1-9]) cd "$(printf "%0.0s../" $(seq 1 "$1"))" || return;;
-    "") cd .. || return;;
-    *) cd "$(pwd | sed -r "s|(.*/$1[^/]*/).*|\1|")" || return
+    [1-9])
+      has seq || return
+      # shellcheck disable=SC2312
+      cd "$(printf "%0.0s../" $(seq 1 "${1}"))" || return
+      ;;
+    "")
+      cd .. || return;;
+    *)
+      # shellcheck disable=SC2312
+      cd "$(pwd | sed -r "s|(.*/${1}[^/]*/).*|\1|")" || return
+      ;;
   esac
 }
 alias up="cd_up"
 ## POSIX cd does not allow '--' and other shells breaks when not using it.
 alias -- -="cd -" 2>/dev/null || true
-test -n "$EDITOR" && alias e='$EDITOR'
-test -n "$VISUAL" && alias v='$VISUAL'
+test -n "${EDITOR-}" && alias e='${EDITOR}'
+test -n "${VISUAL-}" && alias v='${VISUAL}'
 alias j="jobs"
 alias h="history"
 alias l="ls -CF"
@@ -114,7 +125,7 @@ has tmux && {
   tcla(){
     ## Clear all the panes of the current session.
     for _t_pane in $(tmux list-panes -s -F '#{pane_id}'); do
-      tmux clear-history -t "$_t_pane"
+      tmux clear-history -t "${_t_pane}"
     done
   }
 }
@@ -136,7 +147,7 @@ then
   g_alias="$(git config --get-regexp 'alias.*' | sed 's/^alias\.//;s/ .*//')"
   for key in $(printf '%s\n' "${g_alias}"); do
     # shellcheck disable=SC2139,SC2140
-    alias "g$key"="git $key"
+    alias "g${key}"="git ${key}"
   done
   unset g_alias
 fi
@@ -164,16 +175,20 @@ esac
 if test "${color_prompt-}" = "yes"; then
   if has dircolors; then
     ## Use dircolors if available.
-    if test -r "$XDG_CONFIG_HOME/dircolors/dircolors"; then
-      eval "$(dircolors -b "$XDG_CONFIG_HOME/dircolors/dircolors")"
+    if test -r "${XDG_CONFIG_HOME}/dircolors/dircolors"; then
+      dircolors="$(dircolors -b "${XDG_CONFIG_HOME}/dircolors/dircolors")"
+      eval "${dircolors}"
     else
-      eval "$(dircolors -b)"
+      dircolors="$(dircolors -b)"
+      eval "${dircolors}"
     fi
+    unset dircolors
     ## Fix bold on some terminals.
     case "${TERM-}" in
       xterm*|screen*)
-        LS_COLORS="$(echo "$LS_COLORS" | sed -e 's/01;3/00;9/g')"
+        LS_COLORS="$(echo "${LS_COLORS}" | sed -e 's/01;3/00;9/g')"
         ;;
+      *) ;;
     esac
     export LS_COLORS
   else
@@ -232,16 +247,16 @@ _git_prompt_info(){
   esac
   if test -n "${ZSH_VERSION-}"; then
     # shellcheck disable=2016
-    if test "$color_prompt" = "yes"; then
-      print -Pn '(%%{$branchcolor%%}%20>...>$ref%<<%%{\e[00m%%})'
+    if test "${color_prompt}" = "yes"; then
+      print -Pn '(%%{${branchcolor}%%}%20>...>${ref}%<<%%{\e[00m%%})'
     else
-      print -Pn '(%20>...>$ref%<<)'
+      print -Pn '(%20>...>${ref}%<<)'
     fi
   else
-    if test "$color_prompt" = "yes"; then
-      printf '%s' "($branchcolor$ref$reset_color)"
+    if test "${color_prompt}" = "yes"; then
+      printf '%s' "(${branchcolor}${ref}${reset_color})"
     else
-      printf '%s' "($ref)"
+      printf '%s' "(${ref})"
     fi
   fi
   unset ref
@@ -273,17 +288,20 @@ case "${ZSH_VERSION-}" in
 esac
 
 # shellcheck disable=SC2034
-if test "$(id -u)" = "0"; then
+uid="$(id -u)"
+if test "${uid}" = "0"; then
   usercolor="$(printf '%b' "\e[00;97m")"
   ps1_symbol="#"
 fi
+unset uid
 
 ## Do not colorize this prompt, Sh fails to count the correct number of
 ## characters on the prompt leading to problems.
+user="$(id -un)"
 if test "${color_prompt-}" = "yes"; then
-  PS1="[${usercolor}$(id -un) $(hostname -s)${reset_color}]${ps1_symbol} "
+  PS1="[${usercolor}${user} $(hostname -s)${reset_color}]${ps1_symbol} "
 else
-  PS1="$(id -un)@$(hostname -s)${ps1_symbol} "
+  PS1="${user}@$(hostname -s)${ps1_symbol} "
 fi
 ## }}}
 ## {{{ External Functions
@@ -291,7 +309,7 @@ fi
 ## Source file if it is readable.
 ## Usage: source_readable FILE
 source_readable(){
-  for _file in "$@"; do
+  for _file in "${@}"; do
     # shellcheck disable=SC1090
     ! test -r "${_file}" || . "${_file}"
   done
@@ -301,23 +319,23 @@ _fzf_comprun() {
   _fzf_command="$1"
   shift
 
-  case "$_fzf_command" in
+  case "${_fzf_command}" in
     cd) if has tree; then
-          fzf --preview 'tree -C {} | head -200' "$@"
+          fzf --preview 'tree -C {} | head -200' "${@}"
         else
-          fzf "$@"
+          fzf "${@}"
         fi
         ;;
     export|unset)
-      fzf --preview "eval 'echo \$'{}" "$@"
+      fzf --preview "eval 'echo \$'{}" "${@}"
       ;;
     ssh)
       if has dig; then
-        fzf --preview 'dig {}' "$@"
+        fzf --preview 'dig {}' "${@}"
       fi
       ;;
     *)
-      fzf --preview 'test -d {} || cat {}' "$@"
+      fzf --preview 'test -d {} || cat {}' "${@}"
       ;;
   esac
 }
@@ -325,5 +343,5 @@ _fzf_comprun() {
 ## }}}
 ## {{{ End
 ## Source local shell configuration file.
-source_readable "$HOME/.shrc.local"
+source_readable "${HOME}/.shrc.local"
 ## }}}

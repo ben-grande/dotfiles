@@ -17,7 +17,9 @@ if command -v xrdb >/dev/null; then
 fi
 
 ## If running normal OS or Qubes: Dom0, apply settings.
-if ! command -v qubesdb-read >/dev/null || test "$(hostname)" = "dom0"; then
+# shellcheck disable=3028
+hostname="${HOSTNAME:-$(hostname)}"
+if ! command -v qubesdb-read >/dev/null || test "${hostname}" = "dom0"; then
   ## Decrease key repeat delay to X ms.
   ## Increase key repeat rate to Y per second.
   xset r rate 275 60
@@ -65,13 +67,14 @@ for wm in ${wm_list}; do
   if test "${wm}" = "dwm" && command -v xsetroot >/dev/null; then
     desktop_autostart
     while true; do
-      xsetroot -name "$(display-statusbar)"
+      xroot_name="$(display-statusbar)"
+      xsetroot -name "${xroot_name}"
       sleep 60
     done &
   fi
   # shellcheck disable=SC2093
   ${wm} &
-  wm_pid="$!"
+  wm_pid="${!}"
 done
 
 test -z "${wm_pid:-}" || wait "${wm_pid}"

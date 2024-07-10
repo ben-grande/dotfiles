@@ -13,9 +13,9 @@ esac
 
 ## Source default files.
 # shellcheck disable=SC1090,SC1091
-source "$HOME/.profile"
+source "${HOME}/.profile"
 # shellcheck disable=SC1090
-source "$ENV"
+source "${ENV}"
 ## }}}
 ## {{{ Options
 HISTCONTROL=ignoredups
@@ -39,20 +39,27 @@ fi
 _reset_line() {
   case "${TERM-}" in
     ""|dumb|linux*|vt100*|vt220*) return;;
+    *) ;;
   esac
   ## Credit: Can't find the source, posted on StackExchange or alike.
   ## Does not work well on Bash 5.0 and older.
-  test "$(echo "${BASH_VERSION%.*}" | tr -d ".")" -lt 51 && return
+  bash_version_clean="$(echo "${BASH_VERSION%.*}" | tr -d ".")"
+  if test "${bash_version_clean}" -lt 51; then
+    unset bash_version_clean
+    return
+  fi
+  unset bash_version_clean
 
-  local termios cur_y
   ## Ask the terminal for any pending (line buffered) input.
-  termios=$(stty -g) && stty -icanon && stty "$termios"
+  termios="$(stty -g)" && stty -icanon && stty "${termios}"
+  unset termios
   ## On pending input, assume it's been echoed and we're not in first column.
   ## Otherwise ask the terminal for current column and read it from input.
   if read -t 0 || {
-    IFS='[;' read -s -r -d'R' -p$'\033[6n' _ _ cur_y && [[ $cur_y != 1 ]]
+    IFS='[;' read -s -r -d'R' -p$'\033[6n' _ _ cur_y && [[ ${cur_y} != 1 ]]
   }
   then
+    unset cur_y
     ## Print line ending char with reversed video and end with newline.
     if test "${color_prompt-}" = "yes"; then
       printf '%b' "\033[41m\033[0m\033[7m%\033[m\n\r"
@@ -79,12 +86,13 @@ newline=$'\n'
 if test "${color_prompt:-}" = "yes"; then
   # shellcheck disable=SC2154
   PS1="\$(_reset_line)\$(resize-terminal)\[\033[35m\][\[${reset_color}\]"
-  PS1="${PS1}${debian_chroot:+($debian_chroot)}\[${usercolor}\]\u@\h "
+  PS1="${PS1}${debian_chroot:+(${debian_chroot})}\[${usercolor}\]\u@\h "
   PS1="${PS1}\[${dircolor}\]\w\[${reset_color}\]\$(_git_prompt_info)"
   PS1="${PS1}\[\033[35m\]]\[${reset_color}\]${newline-}\$(_print_ec)"
   PS1="${PS1}${ps1_symbol} "
 else
-  PS1="\$(_reset_line)\$(resize-terminal)[${debian_chroot:+($debian_chroot)}"
+  PS1="\$(_reset_line)\$(resize-terminal)"
+  PS1="${PS1}[${debian_chroot:+(${debian_chroot})}"
   PS1="${PS1}\u@\h:\w\$(_git_prompt_info)]${newline-}\$(_print_ec)"
   PS1="${PS1}${ps1_symbol} "
 fi
@@ -92,8 +100,9 @@ fi
 case "${TERM-}" in
   screen*|xterm*|rxvt*)
     ## Set window title
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    PS1="\[\e]0;${debian_chroot:+(${debian_chroot})}\u@\h: \w\a\]${PS1}"
     ;;
+  *) ;;
 esac
 
 case "${TERM-}" in
@@ -113,13 +122,21 @@ fi
 unset newline ps1_symbol
 ## }}}
 ## {{{ Plugins
-! has zoxide || eval "$(zoxide init bash)"
-! has gitlint || eval "$(_GITLINT_COMPLETE=bash_source gitlint)"
+if has zoxide; then
+  zoxide_bash_completion="$(zoxide init bash)"
+  eval "${zoxide_bash_completion}"
+  unset zoxide_bash_completion
+fi
+if has gitlint; then
+  gitlint_bash_completion="$(_GITLINT_COMPLETE=bash_source gitlint)"
+  eval "${gitlint_bash_completion}"
+  unset gitlint_bash_completion
+fi
 
 source_readable /usr/share/doc/fzf/examples/key-bindings.bash
 source_readable /usr/share/doc/fzf/examples/completion.bash
 ## }}}
 ## {{{ End
 ## Source local bash configuration.
-source_readable "$HOME/.bashrc.local"
+source_readable "${HOME}/.bashrc.local"
 ## }}}

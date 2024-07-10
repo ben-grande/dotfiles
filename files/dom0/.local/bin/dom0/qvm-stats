@@ -1,13 +1,27 @@
 #!/bin/bash
 
 # SPDX-FileCopyrightText: 2018 Chris Laprise <https://github.com/tasket>
-# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+# SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
 ## System stats for Qubes dom0
 ## Credits: https://github.com/tasket/Qubes-scripts
 set -eu
+
+if ! command -v sensors >/dev/null; then
+  echo "Program not installed: sensors" >&2
+  exit 1
+fi
+if ! command -v xentop >/dev/null; then
+  echo "Program not installed: xentop" >&2
+  exit 1
+fi
+
+sensors_stats () {
+  # shellcheck disable=SC2312
+  sensors | grep -E "^(${sensor_lines})"
+}
 
 delay=5
 sortcol=3
@@ -17,38 +31,35 @@ newline='
 sumline="--------------------------------------------------------"
 header="\033[2K\nVM NAME                          STATE   CPU(%)   MEM(MB)"
 
-sensors_stats () {
-  sensors | grep -E "^($sensor_lines)"
-}
-
 trap "tput reset" HUP INT QUIT ABRT TERM EXIT
 
 tput reset
 sensors_stats
-echo -e "$header"
-cpusum=0; memsum=0; table="$sumline"
-# shellcheck disable=SC2016
-stdbuf -oL xentop -b -f -d "$delay" | \
+echo -e "${header}"
+cpusum=0; memsum=0; table="${sumline}"
+# shellcheck disable=SC2016,SC2312
+stdbuf -oL xentop -b -f -d "${delay}" | \
   stdbuf -oL awk '{printf ("%-32s %5s %5d   %7d\n", $1,$2,$4,$5/1000) }' | \
   (
     read -r ln
     while true; do
       if read -r -t 0.1 ln; then
-        table="$table$newline$ln"
-        read -r _ _ cpu mem <<<"$ln"
+        table="${table}${newline}${ln}"
+        read -r _ _ cpu mem <<<"${ln}"
         cpusum=$((cpusum+cpu))
         memsum=$((memsum+mem))
       else
         # End of list, print totals, make new page.
-        sort -k $sortcol -n -r <<<"$table"
-        printf '%-32s %5s  %5d   %7d\033[J\033[H' " " " " "$cpusum" "$memsum"
+        sort -k "${sortcol}" -n -r <<<"${table}"
+        printf '%-32s %5s  %5d   %7d\033[J\033[H' " " " " "${cpusum}" \
+          "${memsum}"
         read -r ln
         cpusum=0; memsum=0
-        table="$sumline"
+        table="${sumline}"
         #clear
-        #sensors |grep -E "^($sensor_lines)"
+        #sensors |grep -E "^(${sensor_lines})"
         sensors_stats
-        echo -e "\033[2K$header\n"
+        echo -e "\033[2K${header}\n"
       fi
     done
   )

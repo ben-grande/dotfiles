@@ -7,7 +7,7 @@
 set -eu
 
 if command -v delta >/dev/null; then
-  exec delta "$@"
+  exec delta "${@}"
 else
   : "${DIFF_HIGHLIGHT_SOURCE:=/usr/share/doc/git/contrib/diff-highlight}"
   : "${DIFF_HIGHLIGHT_EXEC:=/usr/share/git-core/contrib/diff-highlight}"
@@ -26,5 +26,5 @@ else
     exec "${DIFF_HIGHLIGHT_EXEC}" | less -RS
   fi
 
-  exec less -RS "$@"
+  exec less -RS "${@}"
 fi

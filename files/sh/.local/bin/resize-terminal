@@ -45,7 +45,8 @@ fi
 if ! echo R | read -r -t 1 -sd R 2>/dev/null; then
   ## Fast but depends on XTerm.
   if has resize; then
-    eval "$(resize)" >/dev/null
+    resize_cmd="$(resize)"
+    eval "${resize_cmd}" >/dev/null
     exit
   fi
   ## Slow due to heavy stty calls.
@@ -53,7 +54,7 @@ if ! echo R | read -r -t 1 -sd R 2>/dev/null; then
   stty raw -echo min 0 time 1
   printf '\0337\033[r\033[99999;99999H\033[6n\0338' >/dev/tty
   IFS='[;R' read -r _ rows cols _ </dev/tty
-  stty "$termios" cols "$cols" rows "$rows"
+  stty "${termios}" cols "${cols}" rows "${rows}"
   unset termios
   exit
 fi
@@ -69,7 +70,7 @@ IFS='[;R' read -r -t 1 -s -d R _ rows cols _ </dev/tty || {
   exit 1
 }
 
-if test ${COLUMNS} -eq "${cols}" && test ${LINES} -eq "${rows}";then
+if test "${COLUMNS}" = "${cols}" && test "${LINES}" = "${rows}";then
   stty echo
   unset rows cols
   exit

@@ -30,13 +30,18 @@ set -eu
 
 command -v git >/dev/null || exit 1
 
+: "${GIT_PUSH_CERT_STATUS:-}"
+: "${GIT_PUSH_CERT_KEY:-}"
+: "${GIT_PUSH_CERT_NONCE_STATUS:-}"
+: "${GIT_PUSH_CERT_NONCE:-}"
+
 obj_rejected=""
 zero="$(git hash-object --stdin </dev/null | tr "0-9a-f" "0")"
 tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/XXXXXX")"
-trap 'rm -f "$tmpdir"' HUP INT QUIT ABRT TERM EXIT
+trap 'rm -f "${tmpdir}"' HUP INT QUIT ABRT TERM EXIT
 
 err(){
-  echo "$*" >&2
+  echo "${*}" >&2
 }
 
 require_signed_push(){
@@ -77,33 +82,33 @@ check_signed_push_keyring(){
   cert="$(git cat-file blob "${GIT_PUSH_CERT}")"
   begin_sig="-----BEGIN PGP SIGNATURE-----"
 
-  cert_msg="$tmpdir"/cert.msg
-  cert_sig="$tmpdir"/cert.sig
+  cert_msg="${tmpdir}"/cert.msg
+  cert_sig="${tmpdir}"/cert.sig
 
   in_sig=0
-  echo "$cert" | while read -r line; do
-    if test "$in_sig" = "1" || test "$line" = "$begin_sig"; then
+  echo "${cert}" | while read -r line; do
+    if test "${in_sig}" = "1" || test "${line}" = "${begin_sig}"; then
       in_sig=1
-      echo "$line" | tee -a "$cert_sig"
-    elif test "$line" != "$begin_sig"; then
-      echo "$line" | tee -a "$cert_msg"
+      echo "${line}" | tee -a "${cert_sig}"
+    elif test "${line}" != "${begin_sig}"; then
+      echo "${line}" | tee -a "${cert_msg}"
     else
       break
     fi
   done
 
-  gpg_out="$("$gpg" --status-fd=1 --no-default-keyring \
+  gpg_out="$("${gpg}" --status-fd=1 --no-default-keyring \
               --homedir "${GIT_PUSH_CERT_PGPHOMEDIR}" \
-              --verify "$cert_sig" "$cert_msg" 2>&1)"
+              --verify "${cert_sig}" "${cert_msg}" 2>&1)"
   gpg_ec="$?"
-  gpg_sig="$(echo "$gpg_out" | awk '/ GOODSIG /{print $3}')"
-  if test "$gpg_ec" = "0"; then
-    true "Cert validation succeeded. Key: $gpg_sig"
+  gpg_sig="$(echo "${gpg_out}" | awk '/ GOODSIG /{print $3}')"
+  if test "${gpg_ec}" = "0"; then
+    true "Cert validation succeeded. Key: ${gpg_sig}"
   else
     err "Cert validation failed. Verification output:"
-    err "$gpg_out"
+    err "${gpg_out}"
   fi
-  rm -rf "$tmpdir"
+  rm -rf "${tmpdir}"
 
   if test "${GIT_PUSH_CERT_NONCE_STATUS}" = "OK"; then
     true "Cert nonce validation succeeded. Nonce: ${GIT_PUSH_CERT_NONCE}"
@@ -119,47 +124,47 @@ if git config --get receive.certNonceSeed >/dev/null 2>&1; then
 fi
 
 while read -r oldrev newrev ref; do
-  true "$oldrev $newrev $ref"
-  test "$newrev" = "$zero" && continue
+  true "${oldrev} ${newrev} ${ref}"
+  test "${newrev}" = "${zero}" && continue
 
-  if test "$oldrev" = "$zero"; then
-    objects="$(git rev-list "$newrev")"
+  if test "${oldrev}" = "${zero}"; then
+    objects="$(git rev-list "${newrev}")"
   else
-    objects="$(git rev-list "$oldrev..$newrev")"
+    objects="$(git rev-list "${oldrev}..${newrev}")"
   fi
 
-  obj_type="$(git cat-file -t "$newrev")"
-  if test "$obj_type" = "tag"; then
-    if git verify-tag "$newrev" >/dev/null 2>&1; then
-      true "Tag validation succeeded for tag: $newrev"
+  obj_type="$(git cat-file -t "${newrev}")"
+  if test "${obj_type}" = "tag"; then
+    if git verify-tag "${newrev}" >/dev/null 2>&1; then
+      true "Tag validation succeeded for tag: ${newrev}"
     else
-      obj_rejected="${obj_rejected-} $newrev "
+      obj_rejected="${obj_rejected-} ${newrev} "
       continue
     fi
-    commit_tag="$(git rev-list -n1 "$newrev")"
-    obj_rejected="$(echo "$obj_rejected" | sed "s/ $commit_tag //")"
-    err "Commit validation done by tag: $commit_tag $newrev"
+    commit_tag="$(git rev-list -n1 "${newrev}")"
+    obj_rejected="$(echo "${obj_rejected}" | sed "s/ ${commit_tag} //")"
+    err "Commit validation done by tag: ${commit_tag} ${newrev}"
     continue
   fi
 
-  for obj in $objects; do
+  for obj in ${objects}; do
 
-    if git verify-commit "$obj" >/dev/null 2>&1; then
-      true "Commit validation succeeded commit: $obj"
+    if git verify-commit "${obj}" >/dev/null 2>&1; then
+      true "Commit validation succeeded commit: ${obj}"
       continue
     else
-      err "No valid signature in commit: $obj"
-      obj_rejected="${obj_rejected-} $obj "
+      err "No valid signature in commit: ${obj}"
+      obj_rejected="${obj_rejected-} ${obj} "
     fi
 
   done
 done
 
-test -n "$obj_rejected" || exit 0
+test -n "${obj_rejected}" || exit 0
 
-obj_rejected="$(echo "$obj_rejected" | tr -s " " |
+obj_rejected="$(echo "${obj_rejected}" | tr -s " " |
   sed -e "s/^ //" -e "s/ $//")"
-err "Couldn't verify objects: $obj_rejected"
+err "Couldn't verify objects: ${obj_rejected}"
 exit 1
 
 ## Force signed pushes if receive.certNonceSeed is set.
@@ -168,42 +173,42 @@ if git config --get receive.certNonceSeed >/dev/null 2>&1; then
 fi
 
 while read -r oldrev newrev ref; do
-  true "$oldrev $newrev $ref"
-  test "$newrev" = "$zero" && continue
+  true "${oldrev} ${newrev} ${ref}"
+  test "${newrev}" = "${zero}" && continue
 
-  if test "$oldrev" = "$zero"; then
-    objects="$(git rev-list "$newrev")"
+  if test "${oldrev}" = "${zero}"; then
+    objects="$(git rev-list "${newrev}")"
   else
-    objects="$(git rev-list "$oldrev..$newrev")"
+    objects="$(git rev-list "${oldrev}..${newrev}")"
   fi
 
-  obj_type="$(git cat-file -t "$newrev")"
-  if test "$obj_type" = "tag"; then
-    if git verify-tag "$newrev" >/dev/null 2>&1; then
-      true "Tag validation succeeded for tag: $newrev"
+  obj_type="$(git cat-file -t "${newrev}")"
+  if test "${obj_type}" = "tag"; then
+    if git verify-tag "${newrev}" >/dev/null 2>&1; then
+      true "Tag validation succeeded for tag: ${newrev}"
     else
-      obj_rejected="${obj_rejected-} $newrev "
+      obj_rejected="${obj_rejected-} ${newrev} "
       continue
     fi
-    commit_tag="$(git rev-list -n1 "$newrev")"
-    obj_rejected="$(echo "$obj_rejected" | sed "s/ $commit_tag //")"
-    err "Commit validation done by tag: $commit_tag $newrev"
+    commit_tag="$(git rev-list -n1 "${newrev}")"
+    obj_rejected="$(echo "${obj_rejected}" | sed "s/ ${commit_tag} //")"
+    err "Commit validation done by tag: ${commit_tag} ${newrev}"
     continue
   fi
 
-  for obj in $objects; do
-    if git verify-commit "$obj" >/dev/null 2>&1; then
-      true "Commit validation succeeded for commit: $obj"
+  for obj in ${objects}; do
+    if git verify-commit "${obj}" >/dev/null 2>&1; then
+      true "Commit validation succeeded for commit: ${obj}"
       continue
     else
-      err "No valid signature in commit: $obj"
-      obj_rejected="${obj_rejected-} $obj "
+      err "No valid signature in commit: ${obj}"
+      obj_rejected="${obj_rejected-} ${obj} "
     fi
   done
 done
 
-test -n "$obj_rejected" || exit 0
+test -n "${obj_rejected}" || exit 0
 
-obj_rejected="$(echo "$obj_rejected" | tr -s " " | sed -e "s/^ //;s/ $//")"
-err "Couldn't verify objects: $obj_rejected"
+obj_rejected="$(echo "${obj_rejected}" | tr -s " " | sed -e "s/^ //;s/ $//")"
+err "Couldn't verify objects: ${obj_rejected}"
 exit 1

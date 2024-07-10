@@ -11,8 +11,8 @@
 ## In the absence of an argument, the script will try to find a 'plugin'
 ##   directory at the defaults Tmux configuration directory in the following
 ##   order (stops at first match):
-##    - ${XDG_CONFIG_HOME-$HOME/.config}/tmux/plugins
-##    - $HOME/.tmux/plugins
+##    - ${XDG_CONFIG_HOME-${HOME}/.config}/tmux/plugins
+##    - ${HOME}/.tmux/plugins
 ##
 ## Note '@plugin' definition is only useful for TPM, this script will source
 ##   all plugins that are found. If you want to deactivate a plugin, move the
@@ -29,12 +29,12 @@
 set -eu
 
 get_plugin_path(){
-  xdg_file="${XDG_CONFIG_HOME-$HOME/.config}/tmux/tmux.conf"
-  home_subdir_file="$HOME/.tmux/tmux.conf"
-  if test -f "$xdg_file"; then
+  xdg_file="${XDG_CONFIG_HOME-${HOME}/.config}/tmux/tmux.conf"
+  home_subdir_file="${HOME}/.tmux/tmux.conf"
+  if test -f "${xdg_file}"; then
     plugin_base="${xdg_file%/tmux.conf}/plugins"
     return 0
-  elif test -f "$home_subdir_file"; then
+  elif test -f "${home_subdir_file}"; then
     plugin_base="${home_subdir_file%/tmux.conf}/plugins"
     return 0
   fi
@@ -45,16 +45,16 @@ set_plugin_path(){
   while true; do
     test -n "${1-}" || break
     cur_arg="$1"; shift
-    case "$cur_arg" in
+    case "${cur_arg}" in
       "")
         break
         ;;
       *)
-        test -d "$cur_arg" || continue
+        test -d "${cur_arg}" || continue
         if test -n "${plugin_base-}"; then
-          plugin_base="${plugin_base-} $cur_arg"; continue
+          plugin_base="${plugin_base-} ${cur_arg}"; continue
         else
-          plugin_base="$cur_arg"; continue
+          plugin_base="${cur_arg}"; continue
         fi
         ;;
     esac
@@ -64,32 +64,32 @@ set_plugin_path(){
 source_plugins(){
   directory="$1"
   ## See shellcheck SC2044 to understand why loops over find are fragile.
-  find "$directory" -maxdepth 1 -type d -not -name "$(printf "*\n*")" | \
+  find "${directory}" -maxdepth 1 -type d -not -name "$(printf "*\n*")" | \
     while read -r plugin
   do
     plugin_name="${plugin##*/}"
     plugin_name="${plugin_name##tmux-}"
     plugin_name="$(echo "${plugin_name}" | tr "-" "_")"
-    plugin_script="$plugin/$plugin_name.tmux"
-    test -r "$plugin_script" || continue
-    "$plugin_script" >/dev/null 2>&1
+    plugin_script="${plugin}/${plugin_name}.tmux"
+    test -r "${plugin_script}" || continue
+    "${plugin_script}" >/dev/null 2>&1
   done
 }
 
 plugin_base=""
 command -v tmux >/dev/null || exit 1
 if test -n "${1-}"; then
-  set_plugin_path "$@"
+  set_plugin_path "${@}"
 else
-  get_plugin_path || exit 1
+  get_plugin_path
 fi
 
 ## Don't fail if not directory was found
 test -n "${plugin_base-}" || exit 0
 
 for p in ${plugin_base}; do
-  test -d "$p" || continue
-  source_plugins "$p"
+  test -d "${p}" || continue
+  source_plugins "${p}"
 done
 
 exit

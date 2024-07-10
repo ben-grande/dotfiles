@@ -15,7 +15,7 @@ set -eu
 usage(){
   # shellcheck disable=2154
   echo "usage: ${0##*/} [SECTION]
-regex: $regex" >&2
+regex: ${regex}" >&2
   exit 1
 }
 
@@ -23,12 +23,12 @@ section=""
 case "${1-}" in
   -h|--help) usage;;
   "") ;;
-  *) section="$1"; test_name section "$section";;
+  *) section="$1"; test_name section "${section}";;
 esac
 
 # shellcheck disable=SC2154
-if ! test -d "$base/$section"; then
-  echo "Section doesn't exist: $section" >&2
+if ! test -d "${base}/${section}"; then
+  echo "Section doesn't exist: ${section}" >&2
   exit 1
 fi
 
@@ -39,10 +39,10 @@ print_bare='
 '
 
 # shellcheck disable=SC2154
-if test -n "$section"; then
-  find "$base/$section" -maxdepth 1 -type d -name "*.git" \
-    -exec sh -c "$print_bare" -- {} \; -prune 2>/dev/null || true
+if test -n "${section}"; then
+  find "${base}/${section}" -maxdepth 1 -type d -name "*.git" \
+    -exec sh -c "${print_bare}" -- {} \; -prune 2>/dev/null || true
 else
-  find "$base" -maxdepth 2 -type d -name "*.git" \
-    -exec sh -c "$print_bare" -- {} \; -prune 2>/dev/null || true
+  find "${base}" -maxdepth 2 -type d -name "*.git" \
+    -exec sh -c "${print_bare}" -- {} \; -prune 2>/dev/null || true
 fi
