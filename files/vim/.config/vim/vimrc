@@ -635,6 +635,7 @@ let g:ragtag_global_maps = 1
 let g:vmt_auto_update_on_save = 0
 let g:vmt_dont_insert_fence = 1
 let g:vmt_list_indent_text = "    "
+let g:vmt_list_flag_min_width = 4
 
 let b:commentary_startofline = 1
 
