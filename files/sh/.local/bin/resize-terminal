@@ -9,12 +9,16 @@
 ## Resize terminal columns and lines to current window size.
 ## Useful for terminals over link (serial console, socat's pty etc).
 
-test -t 0 || exit
+if test -n "${TERM_RESIZE_DISABLE:-}"; then
+  exit 0
+fi
+
+test -t 0 || exit 0
 
 ## If argument is provided, allow user to bypass tty check.
 if test "${#}" -eq 0; then
   ## Shells on graphical sessions (terminal emulators) are skipped.
-  test "${XDG_SESSION_TYPE:-}" = "tty" || exit
+  test "${XDG_SESSION_TYPE:-}" = "tty" || exit 0
   ## Serial ports and devices are desired.
   term_file="$(tty)"
   term_file_wanted="ttyUSB ttyS"
@@ -35,7 +39,7 @@ if test "${#}" -eq 0; then
   ## Terminal can handle screen resizing by itself.
   if test "${term_file_active}" = "0"; then
     unset term_file_active
-    exit
+    exit 0
   fi
   unset term_file_active
 fi
@@ -47,7 +51,7 @@ if ! echo R | read -r -t 1 -sd R 2>/dev/null; then
   if has resize; then
     resize_cmd="$(resize)"
     eval "${resize_cmd}" >/dev/null
-    exit
+    exit 0
   fi
   ## Slow due to heavy stty calls.
   termios="$(stty -g)"
@@ -56,7 +60,7 @@ if ! echo R | read -r -t 1 -sd R 2>/dev/null; then
   IFS='[;R' read -r _ rows cols _ </dev/tty
   stty "${termios}" cols "${cols}" rows "${rows}"
   unset termios
-  exit
+  exit 0
 fi
 
 ## Non-POSIX compliant and fast.
@@ -73,11 +77,11 @@ IFS='[;R' read -r -t 1 -s -d R _ rows cols _ </dev/tty || {
 if test "${COLUMNS}" = "${cols}" && test "${LINES}" = "${rows}";then
   stty echo
   unset rows cols
-  exit
+  exit 0
 elif test "${rows}" -gt 0 && test "${cols}" -gt 0;then
   stty echo cols "${cols}" rows "${rows}"
   unset rows cols
-  exit
+  exit 0
 fi
 
 echo "error: cannot resize screen: unsupported terminal emulator" >&2
