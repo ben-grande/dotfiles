@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2020 Wojtek Porczyk <https://woju.eu>
 # SPDX-FileCopyrightText: 2020 Miguel Jacq <https://mig5.net>
-# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+# SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -13,13 +13,16 @@ send-hook "~t @invisiblethingslab\\.com" "set pgp_autoinline=no crypt_autoencryp
 send-hook "~t @googlegroups\\.com" "set pgp_autoinline=yes crypt_autoencrypt=no"
 
 ## General Encryption and Signature
-set crypt_autopgp            = yes # Use PGP for encryption
-set crypt_autoencrypt        = no  # Encryption is user preference
-set crypt_autosign           = yes # Sign all messages
-set crypt_replyencrypt       = yes # Encrypt replies to encrypted messages
-set crypt_replysignencrypted = yes # Sign replies to encrypted messages
-set crypt_verify_sig         = yes # Verify the opened message signature
-set crypt_use_gpgme          = no  # GPGME interferes with split-gpg
+set crypt_autopgp                 = yes # Use PGP for encryption
+set crypt_autoencrypt             = no  # Encryption is user preference
+set crypt_autosign                = yes # Sign all messages
+set crypt_replyencrypt            = yes # Encrypt replies to encrypted messages
+set crypt_replysignencrypted      = yes # Sign replies to encrypted messages
+set crypt_verify_sig              = yes # Verify the opened message signature
+set crypt_use_gpgme               = no  # GPGME interferes with split-gpg
+set crypt_protected_headers_read  = yes # Display encrypted headers
+set crypt_protected_headers_write = yes # Encrypt headers when composing
+set crypt_protected_headers_save  = no  # Save headers in plain text to disk
 
 ## PGP
 set pgp_autoinline           = no  # Inline is user preference
