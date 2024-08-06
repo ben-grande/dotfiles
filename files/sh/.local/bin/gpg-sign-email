@@ -28,7 +28,7 @@ set -eu
 if test -z "${1-}"; then
   printf '%s\n' "usage: ${0##*/} [PATCH] [PATCH...]"
   printf '%s\n' "example: ${0##*/} *.patch"
-  printf "info: signed files are saved with the suffix '.asc'\n"
+  printf '%s\n' "info: signed files are saved with the suffix '.asc'"
   exit 1
 fi
 
@@ -39,7 +39,7 @@ if test -z "${vi_cmd}"; then
 fi
 
 for f in "${@}"; do
-  cp "${f}" "${f}.asc"
+  cp -- "${f}" "${f}.asc"
   "${vi_cmd}" -u NONE \
     -c 'set nomodeline' -c 'norm gg}j' \
     -c '.,$!gpg -a --clear-sign' \

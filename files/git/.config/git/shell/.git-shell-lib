@@ -25,7 +25,7 @@ fail_invalid_name(){
 test_description(){
   key="$1"
   value="$2"
-  if ! (echo "${value}" | grep -E -q "${description_regex}"); then
+  if ! (echo "${value}" | grep -E -q -e "${description_regex}"); then
     fail_invalid_name "${key}"
   fi
 }
@@ -33,7 +33,7 @@ test_description(){
 test_name(){
   key="$1"
   value="$2"
-  if ! (echo "${value}" | grep -E -q "${regex}"); then
+  if ! (echo "${value}" | grep -E -q -e "${regex}"); then
     fail_invalid_name "${key}"
   fi
 }

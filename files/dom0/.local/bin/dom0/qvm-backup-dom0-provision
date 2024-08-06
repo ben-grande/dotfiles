@@ -15,6 +15,6 @@ source_dirs="
 target_dir="/home/user/backup/$(date +%Y-%m-%d_%H-%M)"
 
 for dir in ${source_dirs}; do
-  mkdir -p "${target_dir}${dir}"
-  cp -a "${dir}"/* "${target_dir}/${dir}"
+  mkdir -p -- "${target_dir}${dir}"
+  cp -a -- "${dir}"/* "${target_dir}/${dir}"
 done

@@ -8,9 +8,9 @@
 # shellcheck disable=SC2312
 : "${HOME:=$(cd ~ && pwd)}"
 # shellcheck disable=SC2312
-: "${USER:=$(id -un || printf %s "${HOME##*/}")}"
+: "${USER:=$(id -un || printf '%s' "${HOME##*/}")}"
 # shellcheck disable=SC2312
-: "${UID:=$(id -u || awk -F ":" -v user="${USER}" '/^user:/{print $3}' \
+: "${UID:=$(id -u || awk -F ":" -v user="${USER}" -- '/^user:/{print $3}' \
   /etc/passwd)}"
 # shellcheck disable=SC2312
 : "${HOSTNAME:=$(hostname)}"
@@ -22,10 +22,10 @@ XDG_CACHE_HOME="${HOME}/.cache"
 XDG_DATA_HOME="${HOME}/.local/share"
 XDG_STATE_HOME="${HOME}/.local/state"
 export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME
-mkdir -p "${XDG_CONFIG_HOME}" "${XDG_CACHE_HOME}" "${XDG_DATA_HOME}" \
+mkdir -p -- "${XDG_CONFIG_HOME}" "${XDG_CACHE_HOME}" "${XDG_DATA_HOME}" \
   "${XDG_STATE_HOME}"
 ## Set XDG_*_DIR variables.
-xdg_dirs="$(awk '/^[ ]*XDG_[A-Z]*_DIR=/{print "export " $1}' \
+xdg_dirs="$(awk -- '/^[ ]*XDG_[A-Z]*_DIR=/{print "export " $1}' \
   "${XDG_CONFIG_HOME}/user-dirs.dirs")"
 eval "${xdg_dirs}"
 
@@ -140,7 +140,7 @@ ssh_agent_dir="${TMPDIR}/ssh-agent-${USER}"
 ssh_agent_sock="${ssh_agent_dir}/agent.sock"
 ssh_agent_pid="${ssh_agent_dir}/agent.pid"
 if test -z "${SSH_AUTH_SOCK-}" && has ssh-agent; then
-  test -d "${ssh_agent_dir}" || mkdir -p "${ssh_agent_dir}"
+  test -d "${ssh_agent_dir}" || mkdir -p -- "${ssh_agent_dir}"
   if test -S "${ssh_agent_sock}" &&
     test -r "${ssh_agent_sock}" &&
     test -w "${ssh_agent_sock}" &&

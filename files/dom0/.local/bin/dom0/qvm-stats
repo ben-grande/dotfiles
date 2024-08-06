@@ -20,7 +20,7 @@ fi
 
 sensors_stats () {
   # shellcheck disable=SC2312
-  sensors | grep -E "^(${sensor_lines})"
+  sensors | grep -E -e "^(${sensor_lines})"
 }
 
 delay=5
@@ -35,7 +35,7 @@ trap "tput reset" HUP INT QUIT ABRT TERM EXIT
 
 tput reset
 sensors_stats
-echo -e "${header}"
+printf '%b\n' "${header}"
 cpusum=0; memsum=0; table="${sumline}"
 # shellcheck disable=SC2016,SC2312
 stdbuf -oL xentop -b -f -d "${delay}" | \
@@ -59,7 +59,7 @@ stdbuf -oL xentop -b -f -d "${delay}" | \
         #clear
         #sensors |grep -E "^(${sensor_lines})"
         sensors_stats
-        echo -e "\033[2K${header}\n"
+        printf '%b\n' "\033[2K${header}\n"
       fi
     done
   )

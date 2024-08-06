@@ -38,8 +38,8 @@ if has lsblk; then
   alias lsblk='lsblk -o ${_lsblk_options}'
   alias lsblku='lsblk -o ${_lsblk_options},UUID,PARTUUID'
 fi
-if ! grep --color 2>&1 | grep -qE "(unrecognized|unknown) option" &&
-  ! grep --exclude 2>&1 | grep -qE "(unrecognized|unknown) option"
+if ! grep --color 2>&1 | grep -qE -e "(unrecognized|unknown) option" &&
+  ! grep --exclude 2>&1 | grep -qE -e "(unrecognized|unknown) option"
 then
   alias grep="grep --exclude='.*.swp' --exclude='*~' --color=auto"
 fi
@@ -66,7 +66,7 @@ cd_up(){
     [1-9])
       has seq || return
       # shellcheck disable=SC2312
-      cd "$(printf "%0.0s../" $(seq 1 "${1}"))" || return
+      cd "$(printf '%0.0s../' $(seq 1 "${1}"))" || return
       ;;
     "")
       cd .. || return;;
@@ -224,7 +224,7 @@ _get_prompt_time(){
   test -n "${SECONDS:-}" || return
   # shellcheck disable=SC2154
   _ptime="$((SECONDS-_saved_prompt_time))"
-  printf "%02d:%02d:%02d" \
+  printf '%02d:%02d:%02d' \
     "$((_ptime/3600))" "$(((_ptime%3600)/60))" "$((_ptime%60))"
 }
 
@@ -321,13 +321,13 @@ _fzf_comprun() {
 
   case "${_fzf_command}" in
     cd) if has tree; then
-          fzf --preview 'tree -C {} | head -200' "${@}"
+          fzf --preview 'tree -C -- {} | head -200' "${@}"
         else
           fzf "${@}"
         fi
         ;;
     export|unset)
-      fzf --preview "eval 'echo \$'{}" "${@}"
+      fzf --preview "eval 'printf '%s\n' \$'{}" "${@}"
       ;;
     ssh)
       if has dig; then
@@ -335,7 +335,7 @@ _fzf_comprun() {
       fi
       ;;
     *)
-      fzf --preview 'test -d {} || cat {}' "${@}"
+      fzf --preview 'test -d {} || cat -- {}' "${@}"
       ;;
   esac
 }

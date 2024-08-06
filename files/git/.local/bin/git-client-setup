@@ -43,7 +43,7 @@ else
   set_git_config format.signature "${user}"
 fi
 
-grep \
-  -E "^;*\s+(vim:.*(\s+|:)|vim:(\s*))(ft|filetype)=gitconfig((\s+|:).*|$)" \
-  -q "${gitconfig_file}" ||
-  sed -i'' "1i; ${vim_modeline}" "${gitconfig_file}"
+grep -E \
+  -e "^;*\s+(vim:.*(\s+|:)|vim:(\s*))(ft|filetype)=gitconfig((\s+|:).*|$)" \
+  -q -- "${gitconfig_file}" ||
+  sed -i'' -e "1i; ${vim_modeline}" -- "${gitconfig_file}"

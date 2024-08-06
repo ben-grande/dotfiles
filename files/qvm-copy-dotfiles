@@ -29,16 +29,16 @@ if test "${qube}" = "dom0"; then
   sh ./dotfiles/setup.sh
   user_name="$(getent group qubes | awk -F "[:,]" '{print $4}')"
   user_home="$(getent passwd "${user_name}" | awk -F ":" '{print $6}')"
-  sudo -u "${user_name}" mkdir -pv "${user_home}/.cache"
-  tmpdir="$(sudo -u "${user_name}" mktemp -d "${user_home}/.cache/XXXXXX")"
+  sudo -u "${user_name}" mkdir -pv -- "${user_home}/.cache"
+  tmpdir="$(sudo -u "${user_name}" -- mktemp -d "${user_home}/.cache/XXXXXX")"
   trap 'rm -rf -- "${tmpdir}"' EXIT INT HUP QUIT ABRT
-  cp -r ./dotfiles "${tmpdir}"
-  chown -R "${user_name}:${user_name}" "${tmpdir}"
-  sudo -u "${user_name}" "${tmpdir}/dotfiles/setup.sh"
+  cp -r -- ./dotfiles "${tmpdir}"
+  chown -R -- "${user_name}:${user_name}" "${tmpdir}"
+  sudo -u "${user_name}" -- "${tmpdir}/dotfiles/setup.sh"
   exit
 fi
 
-qvm-run -q "${qube}" -- "rm -rf ~/QubesIncoming/dom0/files"
+qvm-run -q "${qube}" -- "rm -rf -- ~/QubesIncoming/dom0/files"
 qvm-copy-to-vm "${qube}" ../files
 qvm-run -q "${qube}" -- "sh ~/QubesIncoming/dom0/files/setup.sh"
-qvm-run -q "${qube}" -- "rm -rf ~/QubesIncoming/dom0/files"
+qvm-run -q "${qube}" -- "rm -rf -- ~/QubesIncoming/dom0/files"

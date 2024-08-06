@@ -142,7 +142,7 @@ while read -r oldrev newrev ref; do
       continue
     fi
     commit_tag="$(git rev-list -n1 "${newrev}")"
-    obj_rejected="$(echo "${obj_rejected}" | sed "s/ ${commit_tag} //")"
+    obj_rejected="$(echo "${obj_rejected}" | sed -e "s/ ${commit_tag} //")"
     err "Commit validation done by tag: ${commit_tag} ${newrev}"
     continue
   fi
@@ -191,7 +191,7 @@ while read -r oldrev newrev ref; do
       continue
     fi
     commit_tag="$(git rev-list -n1 "${newrev}")"
-    obj_rejected="$(echo "${obj_rejected}" | sed "s/ ${commit_tag} //")"
+    obj_rejected="$(echo "${obj_rejected}" | sed -e "s/ ${commit_tag} //")"
     err "Commit validation done by tag: ${commit_tag} ${newrev}"
     continue
   fi

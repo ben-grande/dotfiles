@@ -30,8 +30,8 @@ is_bare "${base}/${section}/${repo}"
 description_file="${base}/${section}/${repo}/description"
 
 if test -z "${3-}"; then
-  test -f "${description_file}" || touch "${description_file}"
-  cat "${description_file}"
+  test -f "${description_file}" || touch -- "${description_file}"
+  cat -- "${description_file}"
   exit 0
 fi
 

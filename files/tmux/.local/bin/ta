@@ -20,16 +20,16 @@ new(){
   ## Session name was not specified.
   list="$(tmux list-sessions 2>/dev/null)"
 
-  printf "Choose session or create one by providing a new name:\n"
+  printf '%s\n' "Choose session or create one by providing a new name:"
   if test -n "${list}"; then
-    printf %s"\n${list}\n"
+    printf '\n%s\n' "${list}"
   fi
 
-  printf "\nEnter session name: "
+  printf '\n%s' "Enter session name: "
   read -r name
 
   if test -z "${name}"; then
-    printf "Name cannot be empty.\n"
+    printf '%s\n' "Name cannot be empty."
     return 1
   fi
 }
@@ -61,7 +61,7 @@ main(){
       else
 
         ## No last session, choose one or create one.
-        printf "Last session not found.\n"
+        printf '%s\n' "Last session not found."
         new
 
         if tmux has-session -t "${name}" 2>/dev/null; then

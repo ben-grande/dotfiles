@@ -8,11 +8,11 @@
 
 set -eu
 
-printf "Available commands:\n"
+printf '%s\n' "Available commands:"
 for f in "${0%/*}"/*; do
   test "${f##*/}" != "help" || continue
   test -f "${f}" || continue
   test -x "${f}" || continue
-  usage="$("${f}" --help 2>&1 | head -1 | sed "s/[Uu]sage: //")"
+  usage="$("${f}" --help 2>&1 | head -1 | sed -e "s/[Uu]sage: //")"
   printf ' %-15s\t\t%s\n' "${f##*/}" "${usage}"
 done

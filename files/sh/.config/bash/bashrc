@@ -33,7 +33,7 @@ alias reload="exec bash"
 ## }}}
 ## {{{ Prompt
 if test -z "${debian_chroot:-}" && test -r /etc/debian_chroot; then
-  debian_chroot="$(cat /etc/debian_chroot)"
+  debian_chroot="$(cat -- /etc/debian_chroot)"
 fi
 
 _reset_line() {
@@ -72,7 +72,7 @@ _reset_line() {
 _print_ec(){
   test "${_ec_ps1}" = "0" && return
   if test "${color_prompt:-}" = "yes"; then
-    printf %s"(\001\033[31m\002${_ec_ps1}\001\033[0m\002)"
+    printf '%b%s%b' "(\001\033[31m\002" "${_ec_ps1}" "\001\033[0m\002)"
   else
     printf '%s' "(${_ec_ps1})"
   fi

@@ -39,14 +39,14 @@ desktop_autostart(){
     return 0
   fi
 
-  touch "${TMPDIR:-/tmp}/touch-desktop-autostart"
+  touch -- "${TMPDIR:-/tmp}/touch-desktop-autostart"
   autostart_etc="${XDG_CONFIG_DIRS-/etc/xdg}/autostart"
   autostart_home="${XDG_CONFIG_HOME-${HOME}/.config}/autostart"
 
   for f in "${autostart_etc}"/*.desktop "${autostart_home}"/*.desktop; do
     test -r "${f}" || continue
     # shellcheck disable=SC2091
-    autostart_exec="$(awk -F '=' '/^Exec=/{print $2}' "${f}")"
+    autostart_exec="$(awk -F '=' -- '/^Exec=/{print $2}' "${f}")"
     command -v "${autostart_exec%% *}" >/dev/null || continue
     ${autostart_exec} &
   done

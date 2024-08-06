@@ -13,6 +13,6 @@
 ##   2) Right click on the newly added monitor and choose properties.
 ##   3) Add this script to the command field.
 
-xl list | awk '
+xl list | awk -- '
   BEGIN { mem=0; qubes=0; } / [0-9]+ +[0-9]+ +[0-9]+ / { mem+=$3; qubes++; }
   END { printf("%dQ|%.1fG\n", qubes, mem/1000); }'

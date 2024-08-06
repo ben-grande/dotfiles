@@ -211,8 +211,8 @@ fi
 ## Load completions.
 autoload -Uz compinit
 zmodload zsh/complist
-mkdir -p "$XDG_CACHE_HOME/zsh"
-compinit -u -d "$XDG_CACHE_HOME/zsh/zcompdump"
+mkdir -p -- "$XDG_CACHE_HOME/zsh"
+compinit -u -d -- "$XDG_CACHE_HOME/zsh/zcompdump"
 # _comp_options+=(globdots)
 ! has zoxide || eval "$(zoxide init zsh)"
 ! has gitlint || eval "$(_GITLINT_COMPLETE=zsh_source gitlint)"
@@ -481,7 +481,7 @@ bindkey -M vicmd "^E" edit-command-line
 bindkey -M emacs "\ea" change-first-word
 bindkey -M emacs "^XD" describe-key-briefly
 
-for binding in ${(f)$(bindkey -M emacs|grep '^"\^X')}; do
+for binding in ${(f)$(bindkey -M emacs|grep -e '^"\^X')}; do
   bindkey -M viins "${(@Qz)binding}"
 done
 unset binding

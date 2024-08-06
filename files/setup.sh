@@ -46,6 +46,6 @@ for dir in ${args}; do
       "."|"..") continue;;
       *) ;;
     esac
-    cp -rv "${file}" "${HOME}"
+    cp -rv -- "${file}" "${HOME}"
   done
 done
