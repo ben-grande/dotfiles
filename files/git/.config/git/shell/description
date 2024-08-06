@@ -11,7 +11,7 @@ set -eu
 
 usage(){
   # shellcheck disable=2154
-  echo "usage: ${0##*/} SECTION REPOSITORY [DESCRIPTION]
+  printf '%s\n' "usage: ${0##*/} SECTION REPOSITORY [DESCRIPTION]
 note: prints the current description if none description is specified.:w
 regex: ${regex}" >&2
   exit 1
@@ -35,7 +35,7 @@ if test -z "${3-}"; then
   exit 0
 fi
 
-description="$(echo "$3" | cut -c 1-80)"
+description="$(printf '%s\n' "$3" | cut -c 1-80)"
 test_description description "${description}"
 
-echo "${description}" | tee "${description_file}"
+printf '%s\n' "${description}" | tee "${description_file}"

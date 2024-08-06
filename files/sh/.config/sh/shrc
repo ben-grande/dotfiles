@@ -186,7 +186,7 @@ if test "${color_prompt-}" = "yes"; then
     ## Fix bold on some terminals.
     case "${TERM-}" in
       xterm*|screen*)
-        LS_COLORS="$(echo "${LS_COLORS}" | sed -e 's/01;3/00;9/g')"
+        LS_COLORS="$(printf '%s\n' "${LS_COLORS}" | sed -e 's/01;3/00;9/g')"
         ;;
       *) ;;
     esac

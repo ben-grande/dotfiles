@@ -43,7 +43,7 @@ _reset_line() {
   esac
   ## Credit: Can't find the source, posted on StackExchange or alike.
   ## Does not work well on Bash 5.0 and older.
-  bash_version_clean="$(echo "${BASH_VERSION%.*}" | tr -d ".")"
+  bash_version_clean="$(printf '%s\n' "${BASH_VERSION%.*}" | tr -d ".")"
   if test "${bash_version_clean}" -lt 51; then
     unset bash_version_clean
     return

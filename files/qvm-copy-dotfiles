@@ -14,16 +14,17 @@
 ## sudo ./qvm-copy-dotfiles QUBE
 set -eu
 
-test -n "${1:-}" || { echo "usage: ${0##*/} QUBE"; exit 1; }
+test -n "${1:-}" || { printf '%s\n' "usage: ${0##*/} QUBE"; exit 1; }
 uid="$(id -u)"
-test "${uid}" = "0" || { echo "Program requires root."; exit 1; }
+test "${uid}" = "0" || { printf '%s\n' "Program requires root."; exit 1; }
 
 qube="${1-}"
 if ! qvm-check -- "${qube}" >/dev/null 2>&1; then
-  echo "VM doesn't exist: '${qube}'"
+  printf '%s\n' "VM doesn't exist: '${qube}'"
   exit 1
 fi
-test -f ./setup.sh || { echo "File doesn't exist: './setup.sh'"; exit 1; }
+test -f ./setup.sh ||
+  { printf '%s\n' "File doesn't exist: './setup.sh'"; exit 1; }
 
 if test "${qube}" = "dom0"; then
   sh ./dotfiles/setup.sh

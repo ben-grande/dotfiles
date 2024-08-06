@@ -9,7 +9,7 @@ set -eu
 
 uid="$(id -u)"
 if ! test "${uid}" = "0"; then
-  echo "This program requires root." >&2
+  printf '%s\n' "This program requires root." >&2
   exit 1
 fi
 

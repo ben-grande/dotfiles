@@ -6,7 +6,8 @@
 
 set -eu
 
-test -n "${1:-}" || { echo "Usage: ${0##*/} QUBE [QUBE ...]"; exit 1; }
+test -n "${1:-}" ||
+  { printf '%s\n' "Usage: ${0##*/} QUBE [QUBE ...]"; exit 1; }
 
 vms="${*}"
 

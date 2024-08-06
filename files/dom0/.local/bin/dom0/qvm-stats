@@ -10,11 +10,11 @@
 set -eu
 
 if ! command -v sensors >/dev/null; then
-  echo "Program not installed: sensors" >&2
+  printf '%s\n' "Program not installed: sensors" >&2
   exit 1
 fi
 if ! command -v xentop >/dev/null; then
-  echo "Program not installed: xentop" >&2
+  printf '%s\n' "Program not installed: xentop" >&2
   exit 1
 fi
 

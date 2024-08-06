@@ -18,14 +18,14 @@ regex="^[A-Za-z0-9]+([A-Za-z0-9_.-]+[A-Za-z0-9]+)?$"
 description_regex="^[A-Za-z0-9 _.-]+$"
 
 fail_invalid_name(){
-  echo "Error: invalid value for key: $1" >&2
+  printf '%s\n' "Error: invalid value for key: $1" >&2
   exit 1
 }
 
 test_description(){
   key="$1"
   value="$2"
-  if ! (echo "${value}" | grep -E -q -e "${description_regex}"); then
+  if ! (printf '%s\n' "${value}" | grep -E -q -e "${description_regex}"); then
     fail_invalid_name "${key}"
   fi
 }
@@ -33,7 +33,7 @@ test_description(){
 test_name(){
   key="$1"
   value="$2"
-  if ! (echo "${value}" | grep -E -q -e "${regex}"); then
+  if ! (printf '%s\n' "${value}" | grep -E -q -e "${regex}"); then
     fail_invalid_name "${key}"
   fi
 }
@@ -48,12 +48,12 @@ clean_repo_name(){
 is_bare(){
   _repo="$1"
   if ! test -d "${_repo}"; then
-    echo "Repository doesn't exist: ${_repo}" >&2
+    printf '%s\n' "Repository doesn't exist: ${_repo}" >&2
     return 1
   fi
   bare_repo_check="$(git -C "${_repo}" rev-parse --is-bare-repository)"
   if ! test "${bare_repo_check}" = "true"; then
-    echo "Repository is not bare: ${_repo}" >&2
+    printf '%s\n' "Repository is not bare: ${_repo}" >&2
     return 1
   fi
 }

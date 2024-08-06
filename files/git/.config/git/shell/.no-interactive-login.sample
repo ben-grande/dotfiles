@@ -6,7 +6,7 @@
 
 set -eu
 
-echo "Hello there. You've successfully authenticated, but interactive
+printf '%s\n' "Hello there. You've successfully authenticated, but interactive
 shell access is not available. You have access to these repositories:" >&2
 "${0%/*}"/list >&2
 

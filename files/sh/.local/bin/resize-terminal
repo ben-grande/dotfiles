@@ -15,6 +15,8 @@ fi
 
 test -t 0 || exit 0
 
+msg_unsupported="error: cannot resize screen: unsupported terminal emulator"
+
 ## If argument is provided, allow user to bypass tty check.
 if test "${#}" -eq 0; then
   ## Shells on graphical sessions (terminal emulators) are skipped.
@@ -46,7 +48,7 @@ fi
 
 ## POSIX compliant.
 # shellcheck disable=SC3045
-if ! echo R | read -r -t 1 -sd R 2>/dev/null; then
+if ! printf '%s\n' "R" | read -r -t 1 -sd R 2>/dev/null; then
   ## Fast but depends on XTerm.
   if has resize; then
     resize_cmd="$(resize)"
@@ -68,7 +70,7 @@ stty -echo
 printf '\e7\e[r\033[99999;99999H\e[6n\e8' >/dev/tty
 # shellcheck disable=3045,SC2034
 IFS='[;R' read -r -t 1 -s -d R _ rows cols _ </dev/tty || {
-  echo "error: cannot resize screen: unsupported terminal emulator" >&2
+  printf '%s\n' "${msg_unsupported}" >&2
   stty echo
   unset rows cols
   exit 1
@@ -84,7 +86,7 @@ elif test "${rows}" -gt 0 && test "${cols}" -gt 0;then
   exit 0
 fi
 
-echo "error: cannot resize screen: unsupported terminal emulator" >&2
+printf '%s\n' "${msg_unsupported}" >&2
 stty echo
 unset rows cols
 exit 1

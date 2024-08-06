@@ -41,7 +41,7 @@ tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/XXXXXX")"
 trap 'rm -f "${tmpdir}"' HUP INT QUIT ABRT TERM EXIT
 
 err(){
-  echo "${*}" >&2
+  printf '%s\n' "${*}" >&2
 }
 
 require_signed_push(){
@@ -78,7 +78,7 @@ check_signed_push(){
 check_signed_push_keyring(){
   true "Using keyring to verify push certificate: ${GIT_PUSH_CERT_PGPHOMEDIR}"
 
-  gpg="$(git config --get gpg.program || echo "gpg")"
+  gpg="$(git config --get gpg.program || printf '%s\n' "gpg")"
   cert="$(git cat-file blob "${GIT_PUSH_CERT}")"
   begin_sig="-----BEGIN PGP SIGNATURE-----"
 
@@ -86,12 +86,12 @@ check_signed_push_keyring(){
   cert_sig="${tmpdir}"/cert.sig
 
   in_sig=0
-  echo "${cert}" | while read -r line; do
+  printf '%s\n' "${cert}" | while read -r line; do
     if test "${in_sig}" = "1" || test "${line}" = "${begin_sig}"; then
       in_sig=1
-      echo "${line}" | tee -a "${cert_sig}"
+      printf '%s\n' "${line}" | tee -a "${cert_sig}"
     elif test "${line}" != "${begin_sig}"; then
-      echo "${line}" | tee -a "${cert_msg}"
+      printf '%s\n' "${line}" | tee -a "${cert_msg}"
     else
       break
     fi
@@ -101,7 +101,7 @@ check_signed_push_keyring(){
               --homedir "${GIT_PUSH_CERT_PGPHOMEDIR}" \
               --verify "${cert_sig}" "${cert_msg}" 2>&1)"
   gpg_ec="$?"
-  gpg_sig="$(echo "${gpg_out}" | awk '/ GOODSIG /{print $3}')"
+  gpg_sig="$(printf '%s\n' "${gpg_out}" | awk '/ GOODSIG /{print $3}')"
   if test "${gpg_ec}" = "0"; then
     true "Cert validation succeeded. Key: ${gpg_sig}"
   else
@@ -142,7 +142,8 @@ while read -r oldrev newrev ref; do
       continue
     fi
     commit_tag="$(git rev-list -n1 "${newrev}")"
-    obj_rejected="$(echo "${obj_rejected}" | sed -e "s/ ${commit_tag} //")"
+    obj_rejected="$(printf '%s\n' "${obj_rejected}" | \
+      sed -e "s/ ${commit_tag} //")"
     err "Commit validation done by tag: ${commit_tag} ${newrev}"
     continue
   fi
@@ -162,7 +163,7 @@ done
 
 test -n "${obj_rejected}" || exit 0
 
-obj_rejected="$(echo "${obj_rejected}" | tr -s " " |
+obj_rejected="$(printf '%s\n' "${obj_rejected}" | tr -s " " |
   sed -e "s/^ //" -e "s/ $//")"
 err "Couldn't verify objects: ${obj_rejected}"
 exit 1
@@ -191,7 +192,8 @@ while read -r oldrev newrev ref; do
       continue
     fi
     commit_tag="$(git rev-list -n1 "${newrev}")"
-    obj_rejected="$(echo "${obj_rejected}" | sed -e "s/ ${commit_tag} //")"
+    obj_rejected="$(printf '%s\n' "${obj_rejected}" | \
+      sed -e "s/ ${commit_tag} //")"
     err "Commit validation done by tag: ${commit_tag} ${newrev}"
     continue
   fi
@@ -209,6 +211,7 @@ done
 
 test -n "${obj_rejected}" || exit 0
 
-obj_rejected="$(echo "${obj_rejected}" | tr -s " " | sed -e "s/^ //;s/ $//")"
+obj_rejected="$(printf '%s\n' "${obj_rejected}" | tr -s " " | \
+  sed -e "s/^ //;s/ $//")"
 err "Couldn't verify objects: ${obj_rejected}"
 exit 1

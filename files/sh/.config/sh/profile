@@ -156,7 +156,7 @@ if test -z "${SSH_AUTH_SOCK-}" && has ssh-agent; then
     ssh_agent_env="$(ssh-agent -s -a "${ssh_agent_sock}")"
     eval "${ssh_agent_env}" >/dev/null
     unset ssh_agent_env
-    echo "${SSH_AGENT_PID}" | tee "${ssh_agent_pid}" >/dev/null
+    printf '%s\n' "${SSH_AGENT_PID}" | tee "${ssh_agent_pid}" >/dev/null
   fi
 fi
 unset ssh_agent_dir ssh_agent_sock ssh_agent_pid

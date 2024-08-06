@@ -69,7 +69,7 @@ source_plugins(){
   do
     plugin_name="${plugin##*/}"
     plugin_name="${plugin_name##tmux-}"
-    plugin_name="$(echo "${plugin_name}" | tr "-" "_")"
+    plugin_name="$(printf '%s\n' "${plugin_name}" | tr "-" "_")"
     plugin_script="${plugin}/${plugin_name}.tmux"
     test -r "${plugin_script}" || continue
     "${plugin_script}" >/dev/null 2>&1

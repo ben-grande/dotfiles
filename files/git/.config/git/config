@@ -71,16 +71,16 @@
 	add-unmerged = "!f() { git diff --name-status --diff-filter=U | cut -f2 ; }; git add $(f)"
 	; List tips of branches that are not in the first arg.
 	; git tips origin/master ^origin/alternate | git oneline
-	oneline ="!_() { $(test $# -eq 0 && echo xargs -L1) git log --no-walk --decorate --oneline \"$@\"; }; _"
-	tips = "!_() { t=$(git rev-list --no-merges --max-count=1 \"$@\"); if test -n \"$t\"; then echo $t; _ \"$@\" ^$t; fi; }; _"
+	oneline ="!_() { $(test $# -eq 0 && printf '%s\n' \"xargs -L1\") git log --no-walk --decorate --oneline \"$@\"; }; _"
+	tips = "!_() { t=$(git rev-list --no-merges --max-count=1 \"$@\"); if test -n \"$t\"; then printf '%s\n' \"$t\"; _ \"$@\" ^$t; fi; }; _"
 	; Submodules.
 	sub-update = !sh -c 'git checkout $1 && git submodule update --recursive'
 	; Signed tags and commits
 	stag = "!sh -c 'commit_id=\"$(git rev-parse --verify \"$@\")\"; \
-		tag_name=\"signed_tag_for_$(echo $commit_id | cut -c 1-8)\"; \
+		tag_name=\"signed_tag_for_$(printf '%s\n' \"$commit_id\" | cut -c 1-8)\"; \
 		git tag -s \"$tag_name\" \
 			-m \"Tag for commit $commit_id\" \"$commit_id\"; \
-		echo \"$tag_name\"'" -
+		printf '%s\n' \"$tag_name\"'" -
 	ptag = !git push $(git config branch.$(git branch --show-current).remote) $(git describe)
 	vtag = !git verify-tag -v $(git describe)
 	vhci = !git verify-commit -v $(git rev-parse HEAD)
