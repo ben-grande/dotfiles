@@ -212,7 +212,7 @@ fi
 autoload -Uz compinit
 zmodload zsh/complist
 mkdir -p -- "$XDG_CACHE_HOME/zsh"
-compinit -u -d -- "$XDG_CACHE_HOME/zsh/zcompdump"
+compinit -u -d "$XDG_CACHE_HOME/zsh/zcompdump"
 # _comp_options+=(globdots)
 ! has zoxide || eval "$(zoxide init zsh)"
 ! has gitlint || eval "$(_GITLINT_COMPLETE=zsh_source gitlint)"
