@@ -1,8 +1,11 @@
 {#
 SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
+
+{%- if salt['pillar.get']('qusal:dotfiles:all', default=true) == true -%}
 
 include:
   - .copy-dom0
@@ -16,6 +19,8 @@ include:
   - .copy-vim
   - .copy-x11
   - .copy-xfce
+
+{%- endif -%}
 
 {#
 Unfortunately salt.states.file does not keep permissions when using salt-ssh.

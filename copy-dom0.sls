@@ -1,8 +1,12 @@
 {#
 SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
+
+{%- if ( (salt['pillar.get']('qusal:dotfiles:all', default=true) == true )
+     and (salt['pillar.get']('qusal:dotfiles:dom0', default=true) == true )) -%}
 
 {%- import "dom0/gui-user.jinja" as gui_user -%}
 
@@ -25,3 +29,5 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - user: root
     - group: root
     - makedirs: True
+
+{%- endif %}

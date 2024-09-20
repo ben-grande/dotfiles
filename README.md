@@ -2,6 +2,7 @@
 
 <!--
 SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
 
 SPDX-License-Identifier: CC-BY-SA-4.0
 -->
@@ -13,6 +14,7 @@ Dotfiles.
 *   [Description](#description)
 *   [Installation](#installation)
     *   [Salt](#salt)
+        *   [Pillar](#pillar)
     *   [Script](#script)
 *   [Usage](#usage)
 *   [License](#license)
@@ -58,6 +60,48 @@ Install specific files in Dom0:
 ```sh
 sudo qubesctl state.apply dotfiles.copy-dom0,dotfiles.copy-sh,dotfiles.copy-vim,dotfiles.copy-x11
 ```
+
+#### Pillar
+
+With salt, each state execution can be opt out by topic via a corresponding
+pillar set to a non true value (eg: Setting qusal:dotfiles:dom0 to false will
+disable states specific to dom0, setting qusal:dotfiles:git to false will
+disable states specific to git).
+
+You will need a top file and a sls file in your pillar_roots, when following
+[the Qusal's installation instructions](https://github.com/ben-grande/qusal/blob/main/docs/INSTALL.md),
+`/srv/pillar/qusal` will be added to you pillar_roots.
+
+By default, the formulas assume that you opt-in for all dotfiles.
+
+Example: /srv/pillar/qusal/dotfiles.top:
+
+```yaml
+base:
+  '*':
+    - qusal.dotfiles
+```
+
+It will apply the qusal/dotfiles sls to all targets.
+
+Example: /srv/pillar/qusal/dotfiles.sls containing the data to pass to the
+targets:
+
+```yaml
+qusal:
+  dotfiles:
+    dom0: false
+```
+
+It will disable the dom0 dotfiles configuration.
+
+Enable the pillar top above:
+
+```sh
+sudo qubesctl top.enable qusal.dotfiles pillar=true
+```
+
+Now subsequent calls to the states of this repository will skip copy-dom0.
 
 ### Script
 
