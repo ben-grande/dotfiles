@@ -5,7 +5,20 @@ SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
-{%- if salt['pillar.get']('qusal:dotfiles:all', default=true) == true -%}
+{%- if (
+         ( salt['pillar.get']('qusal:dotfiles:all', default=true) == true  )
+           or salt['pillar.get']('qusal:dotfiles:dom0') == true
+           or salt['pillar.get']('qusal:dotfiles:git')  == true
+           or salt['pillar.get']('qusal:dotfiles:gtk')  == true
+           or salt['pillar.get']('qusal:dotfiles:net')  == true
+           or salt['pillar.get']('qusal:dotfiles:pgp')  == true
+           or salt['pillar.get']('qusal:dotfiles:sh')   == true
+           or salt['pillar.get']('qusal:dotfiles:ssh')  == true
+           or salt['pillar.get']('qusal:dotfiles:vim')  == true
+           or salt['pillar.get']('qusal:dotfiles:x11')  == true
+           or salt['pillar.get']('qusal:dotfiles:xfce') == true
+        )
+-%}
 
 include:
   - .copy-dom0
@@ -19,6 +32,11 @@ include:
   - .copy-vim
   - .copy-x11
   - .copy-xfce
+
+{%- else -%}
+
+"{{ sls }}-is-deactivated":
+  test.nop
 
 {%- endif -%}
 

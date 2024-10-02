@@ -30,4 +30,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - group: root
     - makedirs: True
 
+{%- else -%}
+
+"{{ sls }}-is-deactivated":
+  test.nop
+
 {%- endif %}
