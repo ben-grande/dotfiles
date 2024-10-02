@@ -70,4 +70,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - recurse:
       - mode
 
+{%- else -%}
+
+"{{ sls }}-is-deactivated":
+  test.nop
+
 {%- endif %}

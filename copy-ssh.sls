@@ -29,4 +29,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - user: root
     - group: root
 
+{%- else -%}
+
+"{{ sls }}-is-deactivated":
+  test.nop
+
 {%- endif %}

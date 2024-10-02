@@ -20,6 +20,11 @@ include:
   - .copy-x11
   - .copy-xfce
 
+{%- else -%}
+
+"{{ sls }}-is-deactivated":
+  test.nop
+
 {%- endif -%}
 
 {#

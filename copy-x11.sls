@@ -32,4 +32,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - keep_symlinks: True
     - force_symlinks: True
 
+{%- else -%}
+
+"{{ sls }}-is-deactivated":
+  test.nop
+
 {%- endif %}
