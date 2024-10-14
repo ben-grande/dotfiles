@@ -5,8 +5,11 @@ SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
-{%- if ( (salt['pillar.get']('qusal:dotfiles:all', default=true) == true )
-     and (salt['pillar.get']('qusal:dotfiles:vim', default=true) == true )) -%}
+{%- if (
+         salt['pillar.get']('qusal:dotfiles:all', default=true) == true
+         or salt['pillar.get']('qusal:dotfiles:vim') == true
+       )
+-%}
 
 {%- import "dom0/gui-user.jinja" as gui_user -%}
 
