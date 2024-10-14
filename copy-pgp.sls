@@ -15,6 +15,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - user: {{ gui_user.gui_user }}
     - group: {{ gui_user.gui_user }}
 
+{% if not salt['file.file_exists']('/usr/share/whonix/marker') -%}
+
 "{{ slsdotpath }}-copy-pgp-skel":
   file.recurse:
     - name: /etc/skel/
@@ -23,3 +25,5 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - dir_mode: '0700'
     - user: root
     - group: root
+
+{% endif -%}

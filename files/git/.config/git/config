@@ -137,8 +137,10 @@
 	tool = vimdiff
 	conflictStyle = diff3
 	summary = true
+[protocol "qrexec"]
+	allow = always
 [pull]
-	; Rebase does not verify signatures. Does not prevent manual rebase.
+	; Rebase does not verify signatures. Opt does not prevent manual rebase.
 	rebase = false
 [push]
 	autoSetupRemote = true
