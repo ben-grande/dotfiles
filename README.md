@@ -63,18 +63,15 @@ sudo qubesctl state.apply dotfiles.copy-dom0,dotfiles.copy-sh,dotfiles.copy-vim,
 
 #### Pillar
 
-With salt, each state execution can be opt out by topic via a corresponding
-pillar set to a non true value (eg: Setting qusal:dotfiles:dom0 to false will
-disable states specific to dom0, setting qusal:dotfiles:git to false will
-disable states specific to git).
+By default, all states are executed when applied.  This can be deactivated in
+full or in part by configuring the corresponding pillar data to a non true
+value.
 
 You will need a top file and a sls file in your pillar_roots, when following
 [the Qusal's installation instructions](https://github.com/ben-grande/qusal/blob/main/docs/INSTALL.md),
 `/srv/pillar/qusal` will be added to you pillar_roots.
 
-By default, the formulas assume that you opt-in for all dotfiles.
-
-Example: /srv/pillar/qusal/dotfiles.top:
+Example: `/srv/pillar/qusal/dotfiles.top`
 
 ```yaml
 base:
@@ -82,10 +79,9 @@ base:
     - qusal.dotfiles
 ```
 
-It will apply the qusal/dotfiles sls to all targets.
+It will apply the `qusal/dotfiles.sls` on all targets.
 
-Example: /srv/pillar/qusal/dotfiles.sls containing the data to pass to the
-targets:
+Example: `/srv/pillar/qusal/dotfiles.sls`:
 
 ```yaml
 qusal:
@@ -93,7 +89,10 @@ qusal:
     dom0: false
 ```
 
-It will disable the dom0 dotfiles configuration.
+This will disable the dom0 dotfiles configuration.
+
+For a complete example of a pillar state and a listing of their corresponding
+formulas states, please refer to `pillar.sls.example`.
 
 Enable the pillar top above:
 
@@ -101,7 +100,7 @@ Enable the pillar top above:
 sudo qubesctl top.enable qusal.dotfiles pillar=true
 ```
 
-Now subsequent calls to the states of this repository will skip copy-dom0.
+Now subsequent calls to the states of this repository will skip `copy-dom0.sls`.
 
 ### Script
 

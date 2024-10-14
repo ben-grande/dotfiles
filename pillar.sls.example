@@ -12,37 +12,28 @@ extension and referenced by a top file. See 'pillar.top.example' for an example
 and the README for instructions.
 
 Each entry in the pillar state is optional. You can disable the entire dotfile
-setup by keeping only 'qusal:dotfiles:all' to 'false', or selectively disable
-individual components by setting 'false' for the corresponding state entries.
+setup by keeping *only* 'qusal:dotfiles:all' to 'false', or selectively
+disabling individual components by setting 'false' for the corresponding state
+entries (eg: 'dom0' correspond to 'copy-dom0.sls').
+
+Alternatively you can keep 'qusal:dotfiles:all' to 'true' and selectively
+enabling individual components by setting 'true' for the corresponding state
+entries.
 
 #}
 
 qusal:
   dotfiles:
-    # Control whether or not applying the copy-all.sls or any other dotfiles states.
-    # Disabling it will disable all states, unless some are specifically whitelisted.
     all: true
-    # Control whether or not applying the copy-x11.sls state.
     dom0: true
-    # Control whether or not applying the copy-dom0.sls state.
     git: true
-    # Control whether or not applying the copy-git.sls state.
     gtk: true
-    # Control whether or not applying the copy-gtk.sls state.
     mutt: true
-    # Control whether or not applying the copy-mutt.sls state.
     net: true
-    # Control whether or not applying the copy-net.sls state.
     pgp: true
-    # Control whether or not applying the copy-pgp.sls state.
     sh: true
-    # Control whether or not applying the copy-sh.sls state.
     ssh: true
-    # Control whether or not applying the copy-ssh.sls state.
     tmux: true
-    # Control whether or not applying the copy-tmux.sls state.
     vim: true
-    # Control whether or not applying the copy-vim.sls state.
     x11: true
-    # Control whether or not applying the copy-x11.sls state.
     xfce: true
