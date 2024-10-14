@@ -1,0 +1,19 @@
+{#
+SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+#}
+{#
+
+Example of a pillar top structure for https://github.com/ben-grande/dotfiles
+
+This file need to be placed in your pillar_roots, renamed with a '.top'
+extension, to refer to a valid pillar state file and enabled with 'qubectl
+top.enable'. See 'pillar.sls.example' for an example and the README for
+instructions.
+
+#}
+
+base:
+  '*':
+    - qusal.dotfiles
