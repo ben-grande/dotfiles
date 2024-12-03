@@ -26,12 +26,11 @@ setopt no_beep
 setopt interactive_comments
 ## - History
 SAVEHIST="$HISTSIZE"
+setopt no_extended_history
 setopt hist_expire_dups_first # purge dups first
 setopt hist_ignore_dups # ignore dups in history list
 setopt hist_verify # if command has hist expansion, show it before executing
-setopt append_history # append instead of replacing
-setopt share_history # share history across sessions
-setopt no_inc_append_history # conflicts with share_history
+setopt inc_append_history # append command to history as soon as it runs
 ## - Expansion
 setopt auto_cd
 setopt no_nomatch # if a pattern has no matches print an error
