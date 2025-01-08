@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+# SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -31,6 +31,7 @@ auto_view text/plain text/html
 ## Option 'use_envelope_from' does not work reliably, force Message-ID
 ## format to remove hostname from the header.
 set message_id_format = "<%z@%r%r>"
+set realname          = "$my_name"
 set from              = "$my_user@$my_server"
 set use_from          = yes
 set fast_reply        = yes
@@ -49,13 +50,18 @@ set forward_format    = "Fwd: %s"
 set forward_quote
 
 ## Cache
-set spoolfile         = "+INBOX"
-## GMail duplicates sent mails if the 'record' option is set.
-#set record            = "+Sent"
-unset record
+## Favor local cache for speed, security and privacy.
+set spoolfile           = "+INBOX"
 set mbox                = "~/.cache/mutt/archived"
 set record              = "~/.cache/mutt/sent"
 set postponed           = "~/.cache/mutt/postponed"
+## 'record' has to also be set inside the hook else it is unset.
+folder-hook '.*(\.|@)?(gmail|googlemail)\.com(/.*)?' 'set \
+    spoolfile           = "+INBOX" \
+    mbox                = "+[Gmail]/All Mail" \
+    record              = "~/.cache/mutt/sent" \
+    postponed           = "~/.cache/mutt/postponed" \
+'
 set header_cache        = "~/.cache/mutt/headers"
 set message_cachedir    = "~/.cache/mutt/messages"
 set certificate_file    = "~/.cache/mutt/certificates"
@@ -65,6 +71,7 @@ set history_remove_dups = yes
 set save_history        = 1
 
 ## Alias
-alias me $realname <$from>
+alias me     $realname <$from>
+alias myself $realname <$from>
 
 ## vim: ft=muttrc

@@ -1,6 +1,6 @@
 #!/bin/sh
 ##
-## SPDX-FileCopyrightText: 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2024 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 ##
@@ -13,10 +13,10 @@ credentials_file="${HOME}/.muttrc-credentials.local"
 aliases_file="${HOME}/.muttrc-aliases.local"
 local_file="${HOME}/.muttrc.local"
 
-## source_redable(): do not require that the file exists in the first place.
+## source_existent(): do not require file existence.
 source_existent(){
   for file in "${@}"; do
-    if test -f "${file}"; then
+    if test -f "${file}" && test -r "${file}"; then
       printf '%s\n' "source \"${file}\""
     fi
   done
@@ -26,10 +26,4 @@ source_existent(){
 ## Source files that must exist, let mutt fail otherwise.
 printf '%s\n' "source \"${credentials_file}\""
 
-## PWD is inherited from the muttrc that called this script.
-for file in *.muttrc; do
-  printf '%s\n' "source \"${file}\""
-done
-unset file
-
-source_existent "${aliases_file}" "${local_file}"
+source_existent ./*.muttrc "${aliases_file}" "${local_file}"

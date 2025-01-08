@@ -1,15 +1,24 @@
-## Copy to ~/.config/mutt/offline.muttrc and modify.
+## Copy to ~/.config/mutt/90-offline.muttrc and modify.
 
-set read_only     = yes
-
-unset spoolfile
-unset folder
-unset smtp_url
+## Avoid connection tests.
+unset folder smtp_url pop_host folder spoolfile mbox record postponed
 set imap_passive  = yes
 
-set sendmail      = "env EMAIL_CONN_TEST=x /usr/libexec/msmtp/msmtpq/msmtpq"
-set sendmail_wait = 0
+## Reading and Composing
+set read_only     = yes
 set folder        = "~/mail"
 set spoolfile     = "+INBOX"
+set mbox          = "~/.cache/mutt/archived"
+set record        = "~/.cache/mutt/sent"
+set postponed     = "~/.cache/mutt/postponed"
+mailboxes ! + `for dir in ~/mail/*; do \
+  test -d "${dir}" || continue; \
+  dir="${dir##*/}"; \
+  case "${dir}" in .|..) continue;; esac; \
+  printf '%s' "\"+${dir}\" "; \
+done`
 
+## Sending
+set sendmail      = "env EMAIL_CONN_TEST=x /usr/libexec/msmtp/msmtpq/msmtpq"
+set sendmail_wait = 0
 ## vim: ft=muttrc

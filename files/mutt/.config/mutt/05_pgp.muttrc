@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2020 Wojtek Porczyk <https://woju.eu>
 # SPDX-FileCopyrightText: 2020 Miguel Jacq <https://mig5.net>
-# SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+# SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -12,17 +12,28 @@ send-hook "~t ^security@qubes-os\\.org$" "set pgp_autoinline=no crypt_autoencryp
 send-hook "~t @invisiblethingslab\\.com" "set pgp_autoinline=no crypt_autoencrypt=yes"
 send-hook "~t @googlegroups\\.com" "set pgp_autoinline=yes crypt_autoencrypt=no"
 
-## General Encryption and Signature
-set crypt_autopgp                 = yes # Use PGP for encryption
-set crypt_autoencrypt             = no  # Encryption is user preference
-set crypt_autosign                = yes # Sign all messages
-set crypt_replyencrypt            = yes # Encrypt replies to encrypted messages
-set crypt_replysignencrypted      = yes # Sign replies to encrypted messages
-set crypt_verify_sig              = yes # Verify the opened message signature
-set crypt_use_gpgme               = no  # GPGME interferes with split-gpg
+## General Encryption and Sign
+set crypt_autopgp             = yes # Use PGP for encryption
+set crypt_autoencrypt         = no  # Encryption is user preference
+set crypt_autosign            = yes # Sign all messages
+set crypt_replyencrypt        = yes # Encrypt replies to encrypted messages
+set crypt_replysignencrypted  = yes # Sign replies to encrypted messages
+set crypt_verify_sig          = yes # Verify the opened message signature
+set crypt_use_gpgme           = no  # GPGME interferes with split-gpg
 set crypt_protected_headers_read  = yes # Display encrypted headers
 set crypt_protected_headers_write = yes # Encrypt headers when composing
 set crypt_protected_headers_save  = no  # Save headers in plain text to disk
+
+## Encrypting a message (without signing) provides data confidentiality but
+## lacks authentication and integrity, therefore only makes sense when
+## postponed messages are stored on a remote server, as a local attacker can
+## just wait to read the message unencrypted.
+## Mutt does not provide a sign option for postponed messages, readers should
+## still inspect postponed messages fetched from remote servers for tampering.
+## As Mutt does not provide an option to sign postponed messages, readers
+## should still inspect them when fetched from remote servers for tampering.
+## Self-encrypt postponed messages marked for encryption.
+set postpone_encrypt          = yes
 
 ## PGP
 set pgp_autoinline           = no  # Inline is user preference
