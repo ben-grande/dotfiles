@@ -1,20 +1,34 @@
 #!/bin/sh
 
-# SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+# SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ## qvm-backup only backs up home dir, therefore save other dirs to our home.
 set -eu
 
-source_dirs="
-/etc/qubes/policy.d
-/etc/qubes/backup
-"
-
 target_dir="/home/user/backup/$(date +%Y-%m-%d_%H-%M)"
 
-for dir in ${source_dirs}; do
+usage(){
+  printf '%s\n' "Usage: ${0##*/} [DIR...]"
+  printf '%s\n' "Example: ${0##*/} /etc/qubes/policy.d /etc/qubes/backup"
+  printf '%s\n' "Default: /etc/qubes/policy.d /etc/qubes/backup"
+  printf '%s\n' "Note: backup target: '${target_dir}'"
+  exit "${1:-1}"
+}
+
+case "${@}" in
+  -*) usage 1;;
+  "") set -- /etc/qubes/policy.d /etc/qubes/backup;;
+  *) ;;
+esac
+
+for dir in "${@}"; do
+  if ! test -d "${dir}"; then
+    printf '%s\n' "Directory doesn't exist: '${dir}'" >&2
+    printf '%s\n' "Aborting backup" >&2
+    exit 1
+  fi
   mkdir -p -- "${target_dir}${dir}"
-  cp -a -- "${dir}"/* "${target_dir}/${dir}"
+  cp -ar -- "${dir}"/* "${target_dir}/${dir}"
 done
