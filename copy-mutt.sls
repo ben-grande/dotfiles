@@ -1,5 +1,5 @@
 {#
-SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
@@ -16,6 +16,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - group: {{ gui_user.gui_user }}
     - makedirs: True
 
+"{{ slsdotpath }}-fix-executables-mutt-bin-dir-home":
+  file.directory:
+    - name: {{ gui_user.gui_user_home }}/.local/bin
+    - mode: '0755'
+    - recurse:
+      - mode
+
 "{{ slsdotpath }}-copy-mutt-skel":
   file.recurse:
     - name: /etc/skel
@@ -25,3 +32,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - user: root
     - group: root
     - makedirs: True
+
+"{{ slsdotpath }}-fix-executables-mutt-bin-dir-skel":
+  file.directory:
+    - name: /etc/skel/.local/bin
+    - mode: '0755'
+    - recurse:
+      - mode

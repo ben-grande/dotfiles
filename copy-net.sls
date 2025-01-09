@@ -1,5 +1,5 @@
 {#
-SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
@@ -27,3 +27,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - group: root
     - keep_symlinks: True
     - force_symlinks: True
+
+"{{ slsdotpath }}-fix-executables-net-bin-dir-home":
+  file.directory:
+    - name: {{ gui_user.gui_user_home }}/.local/bin
+    - mode: '0755'
+    - recurse:
+      - mode
+
+"{{ slsdotpath }}-fix-executables-net-bin-dir-skel":
+  file.directory:
+    - name: /etc/skel/.local/bin
+    - mode: '0755'
+    - recurse:
+      - mode
