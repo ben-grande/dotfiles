@@ -62,7 +62,7 @@ _reset_line() {
     unset cur_y
     ## Print line ending char with reversed video and end with newline.
     if test "${color_prompt-}" = "yes"; then
-      printf '%b' "\033[41m\033[0m\033[7m%\033[m\n\r"
+      printf '%b' "\033[41m\033[0m\033[7m%\033[0m\n\r"
     else
       printf '%b' "%\n\r"
     fi
@@ -100,7 +100,7 @@ fi
 case "${TERM-}" in
   screen*|xterm*|rxvt*)
     ## Set window title
-    PS1="\[\e]0;${debian_chroot:+(${debian_chroot})}\u@\h: \w\a\]${PS1}"
+    PS1="\[\033]0;${debian_chroot:+(${debian_chroot})}\u@\h: \w\a\]${PS1}"
     ;;
   *) ;;
 esac
@@ -112,7 +112,7 @@ case "${TERM-}" in
   *)
     ## Reset cursor to steady block after command input and before execution.
     # shellcheck disable=SC2034
-    PS0="\e[2 q\2"
+    PS0="\033[2 q\2"
     ;;
 esac
 if ! shopt -oq posix; then

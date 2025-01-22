@@ -77,7 +77,7 @@ if test "${color_prompt-}" = "yes"; then
   PS1="\$(resize-terminal)%F{magenta}[%{$usercolor%}%n@%m%F{reset_color%}"
   PS1="${PS1} %{$dircolor%}%50<...<%~%<<%F{reset_color%}\$(_git_prompt_info)"
   PS1="${PS1}%F{magenta}]%F{reset_color}${newline-}${ps1_symbol} "
-  RPS1="%(?..(%{"$'\e[31m'"%}%?%{$reset_color%}%)%<<)"
+  RPS1="%(?..(%{"$'\033[31m'"%}%?%{$reset_color%}%)%<<)"
 else
   PS1="\$(resize-terminal)[%n@%M %~\$(_git_prompt_info)]${newline}"
   PS1="${PS1}${ps1_symbol} "
@@ -90,8 +90,8 @@ _set_title() {
     *install*)
       hash -r ;;
   esac
-  print -Pn '\e]1;%l@%m${1+*}\a'
-  print -Pn '\e]2;%n@%m:%~'
+  print -Pn '\033]1;%l@%m${1+*}\a'
+  print -Pn '\033]2;%n@%m:%~'
   if test -n "${1:-}"; then
     print -Pnr ' (%24>..>$1%>>)' | tr '\0-\037' '?'
   fi
@@ -103,20 +103,20 @@ case "${TERM-}" in
     precmd() {
       _set_title "$@"
       if [ "${STY:-}" -o "${TMUX:-}" ]; then
-        # print -Pn "\e]1;\a\e]1;@%m\a"
-        print -Pn '\ek@\e\\'
+        # print -Pn "\033]1;\a\033]1;@%m\a"
+        print -Pn '\033k@\033\\'
       else
-        print -Pn '\ek@%m\e\\'
+        print -Pn '\033k@%m\033\\'
       fi
     }
     preexec() {
       _set_title "$@"
-      print -n "\ek"
+      print -n "\033k"
       print -Pnr '%10>..>$1' | tr '\0-\037' '?'
       if [ "${STY:-}" -o "${TMUX:-}" ]; then
-        print -Pn '@\e\\'
+        print -Pn '@\033\\'
       else
-        print -Pn '@%m\e\\'
+        print -Pn '@%m\033\\'
       fi
     }
   ;;
@@ -301,10 +301,10 @@ function clear-screen-and-scrollback() {
   esac
   test -n "${TTY-}" || return
   echoti civis >"${TTY-}"
-  printf '%b' "\e[H\e[2J" >"${TTY-}"
+  printf '%b' "\033[H\033[2J" >"${TTY-}"
   zle .reset-prompt
   zle -R
-  printf '%b' "\e[3J" >"${TTY-}"
+  printf '%b' "\033[3J" >"${TTY-}"
   echoti cnorm >"${TTY-}"
 }
 zle -N clear-screen-and-scrollback
@@ -341,8 +341,8 @@ case "${TERM-}" in
   *)
     zle-keymap-select zle-line-init() {
       case $KEYMAP in
-        vicmd)      print -n -- "\e[2 q";;
-        viins|main) print -n -- "\e[5 q";;
+        vicmd)      print -n -- "\033[2 q";;
+        viins|main) print -n -- "\033[5 q";;
       esac
 
       zle reset-prompt
@@ -350,7 +350,7 @@ case "${TERM-}" in
     }
 
     zle-line-finish() {
-      print -n -- "\e[2 q"
+      print -n -- "\033[2 q"
     }
 
     zle -N zle-line-init
@@ -420,56 +420,56 @@ bindkey -M menuselect "^M" accept-line
 ## https://invisible-island.net/xterm/xterm-function-keys.html
 ##
 ## Shit+Tab
-bindkey-multi emacs viins menuselect -- "\E[Z" "${terminfo[kcbt]}" \
+bindkey-multi emacs viins menuselect -- "\033[Z" "${terminfo[kcbt]}" \
   -- reverse-menu-complete
 ## Backspace
 bindkey-multi emacs viins vicmd menuselect -- "^H" "^?" "${terminfo[kbs]}" \
   -- backward-delete-char
 ## Home
-bindkey-multi emacs viins vicmd -- "\E[1~" "\E[7~" "\E[H" "\EOH" \
+bindkey-multi emacs viins vicmd -- "\033[1~" "\033[7~" "\033[H" "\033OH" \
   "${terminfo[khome]}" \
   -- beginning-of-line
 ## Insert
-bindkey-multi emacs viins vicmd -- "\E[2~" "\E[L" "${terminfo[kich1]}" \
+bindkey-multi emacs viins vicmd -- "\033[2~" "\033[L" "${terminfo[kich1]}" \
   -- overwrite-mode
 ## Delete
-bindkey-multi emacs viins vicmd -- "\E[3~" "\E[P" "\EOP" \
+bindkey-multi emacs viins vicmd -- "\033[3~" "\033[P" "\033OP" \
   "${terminfo[kdch1]}" \
   -- vi-delete-char
 ## End
-bindkey-multi emacs viins vicmd -- "\E[4~" "\E[8~" "\E[F" "\EOF" \
+bindkey-multi emacs viins vicmd -- "\033[4~" "\033[8~" "\033[F" "\033OF" \
   "${terminfo[kend]}" \
   -- end-of-line
 ## PgUp
-bindkey-multi emacs viins -- "\E[5~" "\E[I" "${terminfo[kpp]}" \
+bindkey-multi emacs viins -- "\033[5~" "\033[I" "${terminfo[kpp]}" \
   -- beginning-of-buffer-or-history
 ## PgDown
-bindkey-multi emacs viins -- "\E[6~" "\E[G" "${terminfo[knp]}" \
+bindkey-multi emacs viins -- "\033[6~" "\033[G" "${terminfo[knp]}" \
   -- end-of-buffer-or-history
 ## Up arrow
-bindkey-multi emacs viins vicmd -- "\E[A" "\EOA" "${terminfo[kcuu1]}" \
+bindkey-multi emacs viins vicmd -- "\033[A" "\033OA" "${terminfo[kcuu1]}" \
   -- up-line-or-history
 ## Down arrow
-bindkey-multi emacs viins vicmd -- "\E[B" "\EOB" "${terminfo[kcud1]}" \
+bindkey-multi emacs viins vicmd -- "\033[B" "\033OB" "${terminfo[kcud1]}" \
   -- down-line-or-history
 ## Right arrow
-bindkey-multi emacs viins vicmd -- "\E[1C" "\E[C" "\EOC" \
+bindkey-multi emacs viins vicmd -- "\033[1C" "\033[C" "\033OC" \
   "${terminfo[kcuf1]}" \
   -- forward-char
 ## Left arrow
-bindkey-multi emacs viins vicmd -- "\E[D" "\EOD" "${terminfo[kcub1]}" \
+bindkey-multi emacs viins vicmd -- "\033[D" "\033OD" "${terminfo[kcub1]}" \
   -- backward-char
 ## Ctrl-Delete
-bindkey-multi emacs viins vicmd -- "\E[3;5~" "\E[3\^" "${terminfo[kDC5]}"  \
+bindkey-multi emacs viins vicmd -- "\033[3;5~" "\033[3\^" "${terminfo[kDC5]}"  \
   -- kill-word
 ## Ctrl-RightArrow
-bindkey-multi emacs viins vicmd -- "\E[1;5C" "\E0c" "${terminfo[kRIT5]}" \
+bindkey-multi emacs viins vicmd -- "\033[1;5C" "\0330c" "${terminfo[kRIT5]}" \
   -- forward-word
 ## Ctrl-LeftArrow
-bindkey-multi emacs viins vicmd -- "\E[1;5D" "\E0d" "${terminfo[kLFT5]}" \
+bindkey-multi emacs viins vicmd -- "\033[1;5D" "\0330d" "${terminfo[kLFT5]}" \
   -- backward-word
 ## F11
-bindkey-multi emacs viins -- "\E[23~" "${terminfo[kf11]}" -- new-screen
+bindkey-multi emacs viins -- "\033[23~" "${terminfo[kf11]}" -- new-screen
 
 autoload -Uz edit-command-line
 zle -N edit-command-line
@@ -477,7 +477,7 @@ bindkey -M emacs "^[e" edit-command-line
 bindkey -M emacs "^X^E" edit-command-line
 bindkey -M vicmd "^E" edit-command-line
 
-bindkey -M emacs "\ea" change-first-word
+bindkey -M emacs "\033a" change-first-word
 bindkey -M emacs "^XD" describe-key-briefly
 
 for binding in ${(f)$(bindkey -M emacs|grep -e '^"\^X')}; do

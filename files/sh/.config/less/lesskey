@@ -18,4 +18,4 @@ i toggle-option i
 ^F right
 ^N down
 ^P up
-\ef word-right
+\033f word-right

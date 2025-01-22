@@ -67,7 +67,7 @@ fi
 
 ## Non-POSIX compliant and fast.
 stty -echo
-printf '\e7\e[r\033[99999;99999H\e[6n\e8' >/dev/tty
+printf '\0337\033[r\033[99999;99999H\033[6n\0338' >/dev/tty
 # shellcheck disable=3045,SC2034
 IFS='[;R' read -r -t 1 -s -d R _ rows cols _ </dev/tty || {
   printf '%s\n' "${msg_unsupported}" >&2

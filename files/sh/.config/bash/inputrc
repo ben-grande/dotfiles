@@ -20,13 +20,13 @@ set editing-mode emacs
 set show-mode-in-prompt on
 
 $if term=linux
-  set emacs-mode-string  "\1\e[?0c\2"
-  set vi-ins-mode-string "\1\e[?0c\2"
-  set vi-cmd-mode-string "\1\e[?8c\2"
+  set emacs-mode-string  "\1\033[?0c\2"
+  set vi-ins-mode-string "\1\033[?0c\2"
+  set vi-cmd-mode-string "\1\033[?8c\2"
 $else
-  set emacs-mode-string  "\1\e[5 q\2"
-  set vi-ins-mode-string "\1\e[5 q\2"
-  set vi-cmd-mode-string "\1\e[2 q\2"
+  set emacs-mode-string  "\1\033[5 q\2"
+  set vi-ins-mode-string "\1\033[5 q\2"
+  set vi-cmd-mode-string "\1\033[2 q\2"
 $endif
 
 $if term=''
@@ -59,8 +59,8 @@ $if mode=emacs
 
   set keymap emacs-ctlx
   v: vi-editing-mode
-  Control-v: "\C-xv\e"
-  Esc: "\C-xv\e"
+  Control-v: "\C-xv\033"
+  Esc: "\C-xv\033"
   set keymap emacs
 
 $else
@@ -117,46 +117,46 @@ $endif
 
 
 ## Home
-"\e[1~": beginning-of-line
-"\e[H": beginning-of-line
-"\eOH": beginning-of-line
+"\033[1~": beginning-of-line
+"\033[H": beginning-of-line
+"\033OH": beginning-of-line
 
 ## End
-"\e[4~": end-of-line
-"\e[F": end-of-line
-"\eOF": end-of-line
+"\033[4~": end-of-line
+"\033[F": end-of-line
+"\033OF": end-of-line
 
 ## Delete
-"\e[3~": delete-char
-"\e[P": delete-char
-"\eOP": delete-char
+"\033[3~": delete-char
+"\033[P": delete-char
+"\033OP": delete-char
 
 ## Insert
-"\e[2~": quoted-insert
-"\e[L": quoted-insert
+"\033[2~": quoted-insert
+"\033[L": quoted-insert
 
 ## PgUp
-"\e[5~": beginning-of-history
-"\e[I": beginning-of-history
+"\033[5~": beginning-of-history
+"\033[I": beginning-of-history
 
 ## PgDown
-"\e[6~": end-of-history
-"\e[G": end-of-history
+"\033[6~": end-of-history
+"\033[G": end-of-history
 
 ## Ctrl+RighArrow
-"\e[1;5C": forward-word
-"\e[5C": forward-word
-"\e\e[C": forward-word
+"\033[1;5C": forward-word
+"\033[5C": forward-word
+"\033\033[C": forward-word
 
 ## Ctrl+LeftArrow
-"\e[1;5D": backward-word
-"\e[5D": backward-word
-"\e\e[D": backward-word
+"\033[1;5D": backward-word
+"\033[5D": backward-word
+"\033\033[D": backward-word
 
 ## Terminal
 $if term=rxvt
-  "\e[7~": beginning-of-line
-  "\e[8~": end-of-line
-  "\eOc": forward-word
-  "\eOd": backward-word
+  "\033[7~": beginning-of-line
+  "\033[8~": end-of-line
+  "\033Oc": forward-word
+  "\033Od": backward-word
 $endif

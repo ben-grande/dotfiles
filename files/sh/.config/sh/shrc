@@ -241,14 +241,14 @@ _git_prompt_info(){
   test "${ref-}" || return
   # shellcheck disable=2039,3003
   case "${TERM-}" in
-    *-256color|xterm-kitty) branchcolor=$'\e[38;5;31m' ;;
-    *-88color|rxvt-unicode) branchcolor=$'\e[38;5;22m' ;;
-    *) branchcolor=$'\e[00;94m' ;;
+    *-256color|xterm-kitty) branchcolor=$'\033[38;5;31m' ;;
+    *-88color|rxvt-unicode) branchcolor=$'\033[38;5;22m' ;;
+    *) branchcolor=$'\033[0;94m' ;;
   esac
   if test -n "${ZSH_VERSION-}"; then
     # shellcheck disable=2016
     if test "${color_prompt}" = "yes"; then
-      print -Pn '(%%{${branchcolor}%%}%20>...>${ref}%<<%%{\e[00m%%})'
+      print -Pn '(%%{${branchcolor}%%}%20>...>${ref}%<<%%{\033[0m%%})'
     else
       print -Pn '(%20>...>${ref}%<<)'
     fi
@@ -263,22 +263,22 @@ _git_prompt_info(){
 }
 
 # shellcheck disable=SC2034
-reset_color="$(printf '%b' '\e[00m')"
+reset_color="$(printf '%b' '\033[0m')"
 
 # shellcheck disable=SC2034
 ## Use echotc Co? Only available by default for zsh, not bash.
 case "${TERM-}" in
   *-256color|xterm-kitty)
-    usercolor="$(printf '%b' "\e[38;5;184m")"
-    dircolor="$(printf '%b' "\e[38;5;27m")"
+    usercolor="$(printf '%b' "\033[38;5;184m")"
+    dircolor="$(printf '%b' "\033[38;5;27m")"
     ;;
   *-88color|rxvt-unicode)
-    usercolor="$(printf '%b' "\e[38;5;56m")"
-    dircolor="$(printf '%b' "\e[38;5;23m")"
+    usercolor="$(printf '%b' "\033[38;5;56m")"
+    dircolor="$(printf '%b' "\033[38;5;23m")"
     ;;
   *)
-    usercolor="$(printf '%b' "\e[00;93m")"
-    dircolor="$(printf '%b' "\e[01;34m")"
+    usercolor="$(printf '%b' "\033[0;93m")"
+    dircolor="$(printf '%b' "\033[1;34m")"
     ;;
 esac
 
@@ -290,7 +290,7 @@ esac
 # shellcheck disable=SC2034
 uid="$(id -u)"
 if test "${uid}" = "0"; then
-  usercolor="$(printf '%b' "\e[00;97m")"
+  usercolor="$(printf '%b' "\033[0;97m")"
   ps1_symbol="#"
 fi
 unset uid
