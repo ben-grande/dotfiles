@@ -29,7 +29,7 @@ for prog in "${@}"; do
   test -x "${cmd}" || continue
 
   case "${action-}" in
-    show) printf '%s\n' "${cmd}"; exit 0;;
+    show) printf '%s\n' "${cmd}"; unset cmd; exit 0;;
     *) exit 0;;
   esac
 done

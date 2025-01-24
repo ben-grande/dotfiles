@@ -134,8 +134,8 @@ case "${TERM-}" in
     ;;
 esac
 
-unset hostcolor hostletter hostcode dircolor usercolor usercode reset_color
-unset newline
+unset hostcolor hostletter hostcode dircolor usercolor usercode reset_color \
+      newline ps1_symbol
 ## }}}
 ## {{{ Completions
 
@@ -340,7 +340,7 @@ case "${TERM-}" in
   ""|dumb|linux*|vt100*|vt220*) ;;
   *)
     zle-keymap-select zle-line-init() {
-      case $KEYMAP in
+      case "${KEYMAP:-}" in
         vicmd)      print -n -- "\033[2 q";;
         viins|main) print -n -- "\033[5 q";;
       esac

@@ -10,7 +10,7 @@
 # shellcheck disable=SC2312
 : "${USER:=$(id -un || printf '%s' "${HOME##*/}")}"
 # shellcheck disable=SC2312
-: "${UID:=$(id -u || awk -F ":" -v user="${USER}" -- '/^user:/{print $3}' \
+: "${UID:=$(id -u || awk -F ":" -v user="${USER}" -- '$1 == user {print $3}' \
   /etc/passwd)}"
 # shellcheck disable=SC2312
 : "${HOSTNAME:=$(hostname)}"
@@ -28,6 +28,7 @@ mkdir -p -- "${XDG_CONFIG_HOME}" "${XDG_CACHE_HOME}" "${XDG_DATA_HOME}" \
 xdg_dirs="$(awk -- '/^[ ]*XDG_[A-Z]*_DIR=/{print "export " $1}' \
   "${XDG_CONFIG_HOME}/user-dirs.dirs")"
 eval "${xdg_dirs}"
+unset xdg_dirs
 
 ## Set directory to be used for coding.
 CODEDIR="${HOME}/src"
@@ -156,7 +157,7 @@ if test -z "${SSH_AUTH_SOCK-}" && has ssh-agent; then
     ssh_agent_env="$(ssh-agent -s -a "${ssh_agent_sock}")"
     eval "${ssh_agent_env}" >/dev/null
     unset ssh_agent_env
-    printf '%s\n' "${SSH_AGENT_PID}" | tee "${ssh_agent_pid}" >/dev/null
+    printf '%s\n' "${SSH_AGENT_PID}" | tee -- "${ssh_agent_pid}" >/dev/null
   fi
 fi
 unset ssh_agent_dir ssh_agent_sock ssh_agent_pid
@@ -170,6 +171,7 @@ for f in "${XDG_CONFIG_HOME}/sh/profile.d"/*.sh; do
   # shellcheck disable=SC1090,SC1091
   ! test -r "${f}" || . "${f}"
 done
+unset f
 
 ## Source local profile.
 # shellcheck disable=SC1090,SC1091

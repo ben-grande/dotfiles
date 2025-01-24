@@ -19,7 +19,9 @@ fi
 ## If running normal OS or Qubes: Dom0, apply settings.
 # shellcheck disable=3028
 hostname="${HOSTNAME:-$(hostname)}"
-if ! command -v qubesdb-read >/dev/null || test "${hostname}" = "dom0"; then
+if ! command -v qubesdb-read >/dev/null || test "${hostname}" = "dom0" ||
+  test -f /var/run/qubes-service/guivm
+then
   ## Decrease key repeat delay to X ms.
   ## Increase key repeat rate to Y per second.
   xset r rate 275 60
@@ -32,6 +34,7 @@ if ! command -v qubesdb-read >/dev/null || test "${hostname}" = "dom0"; then
 
   #qvm-prefs dom0 keyboard_layout "us+dvorak+grp:win_space_toggle,ctrl:nocaps"
 fi
+unset hostname
 
 ## Autostart desktop applications if the WM does not.
 desktop_autostart(){
@@ -50,6 +53,7 @@ desktop_autostart(){
     command -v "${autostart_exec%% *}" >/dev/null || continue
     ${autostart_exec} &
   done
+  unset f
 }
 
 ## Source Xorg profiles.
@@ -59,6 +63,7 @@ if test -r "${HOME}/.xprofile.local"; then
     # shellcheck disable=SC1090,SC1091
     ! test -r "${x11_profile}" || . "${x11_profile}"
   done
+  unset x11_profile
 fi
 
 : "${wm_list:="dwm"}"
@@ -69,6 +74,7 @@ for wm in ${wm_list}; do
     while true; do
       xroot_name="$(display-statusbar)"
       xsetroot -name "${xroot_name}"
+      unset xroot_name
       sleep 60
     done &
   fi
@@ -76,5 +82,7 @@ for wm in ${wm_list}; do
   ${wm} &
   wm_pid="${!}"
 done
+unset wm
 
 test -z "${wm_pid:-}" || wait "${wm_pid}"
+unset wm_pid

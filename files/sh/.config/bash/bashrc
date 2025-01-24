@@ -43,7 +43,11 @@ _reset_line() {
   esac
   ## Credit: Can't find the source, posted on StackExchange or alike.
   ## Does not work well on Bash 5.0 and older.
-  bash_version_clean="$(printf '%s\n' "${BASH_VERSION%.*}" | tr -d ".")"
+  bash_version_clean="${BASH_VERSION%.*}"
+  bash_version_clean="${bash_version_clean//\./}"
+  if [[ ! ${bash_version_clean} =~ ^[0-9]+$ ]]; then
+    return
+  fi
   if test "${bash_version_clean}" -lt 51; then
     unset bash_version_clean
     return
@@ -76,6 +80,7 @@ _print_ec(){
   else
     printf '%s' "(${_ec_ps1})"
   fi
+  unset _ec_ps1
 }
 
 _save_ec() { _ec_ps1=$?; }
@@ -119,7 +124,7 @@ if ! shopt -oq posix; then
   source_readable /usr/share/bash-completion/bash_completion
 fi
 
-unset newline ps1_symbol
+unset newline ps1_symbol dircolor reset_color usercolor
 ## }}}
 ## {{{ Plugins
 if has zoxide; then
