@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # SPDX-FileCopyrightText: 2018 Chris Laprise <https://github.com/tasket>
-# SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+# SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
@@ -9,57 +9,79 @@
 ## Credits: https://github.com/tasket/Qubes-scripts
 set -eu
 
-if ! command -v sensors >/dev/null; then
-  printf '%s\n' "Program not installed: sensors" >&2
-  exit 1
-fi
 if ! command -v xentop >/dev/null; then
   printf '%s\n' "Program not installed: xentop" >&2
   exit 1
 fi
+sensors="1"
+if ! command -v sensors >/dev/null; then
+  sensors="0"
+fi
 
-sensors_stats () {
-  # shellcheck disable=SC2312
-  sensors | grep -E -e "^(${sensor_lines})"
+redraw(){
+  stty size </dev/null 2>&1 >&2 | read -r LINES COLUMNS
+  tput ed home
 }
 
-delay=5
-sortcol=3
-sensor_lines='Package id 0|fan1|CPU'
+do_tui(){
+  stty -echo -icanon
+  tput smcup civis home
+}
+
+undo_tui(){
+  stty echo icanon
+  tput cnorm rmcup
+}
+
+trap 'undo_tui' HUP INT QUIT ABRT TERM EXIT
+trap 'redraw' WINCH
+do_tui
+
+get_header(){
+  cpusum=0
+  memsum=0
+  table=""
+  if test "${sensors}" != "0"; then
+    sensors | grep -E -e "^(fan[1-9]+|[C|G]PU|temp[1-9]+):" |
+      grep -v -e "0 RPM" -e "+0\.0.C" |
+      tr -s "\t" " " | tr "\n" "\t" | sed "s/\s\+$/\n/"
+  fi
+  printf '%s%-40s %-6s %6s   %8s%s\n' "${bold}" 'Qube' 'State' 'CPU(%)' \
+    'MEM(MiB)' "${nobold}"
+}
+
+
+table=""
+delay=1
+sortcol=1
 newline='
 '
-sumline="--------------------------------------------------------"
-header="\033[2K\nVM NAME                          STATE   CPU(%)   MEM(MB)"
+bold="$(tput smso)"
+nobold="$(tput rmso)"
+index=0
 
-trap "tput reset" HUP INT QUIT ABRT TERM EXIT
-
-tput reset
-sensors_stats
-printf '%b\n' "${header}"
-cpusum=0; memsum=0; table="${sumline}"
+get_header
 # shellcheck disable=SC2016,SC2312
-stdbuf -oL xentop -b -f -d "${delay}" | \
-  stdbuf -oL awk '{printf ("%-32s %5s %5d   %7d\n", $1,$2,$4,$5/1000) }' | \
+xentop -b -f -d "${delay}" | \
+  stdbuf -oL awk '{printf ("%-40s %-6s %6d   %8d\n", $1,$2,$4,$5/1000) }' | \
   (
-    read -r ln
+    read -r _
     while true; do
-      if read -r -t 0.1 ln; then
-        table="${table}${newline}${ln}"
-        read -r _ _ cpu mem <<<"${ln}"
+      if read -r -t 0.1 line; then
+        table="${table:+${table}${newline}}${line}"
+        read -r _ _ cpu mem <<<"${line}"
+        index=$((index+1))
         cpusum=$((cpusum+cpu))
         memsum=$((memsum+mem))
+        cpuavg=$((cpusum/index))
       else
-        # End of list, print totals, make new page.
-        sort -k "${sortcol}" -n -r <<<"${table}"
-        printf '%-32s %5s  %5d   %7d\033[J\033[H' " " " " "${cpusum}" \
-          "${memsum}"
-        read -r ln
-        cpusum=0; memsum=0
-        table="${sumline}"
-        #clear
-        #sensors |grep -E "^(${sensor_lines})"
-        sensors_stats
-        printf '%b\n' "\033[2K${header}\n"
+        index=0
+        sort -k "${sortcol}" -n <<<"${table}"
+        printf '%s%-s %-34s %-6s %6d   %8d%s' "${bold}" "Total" "" "" \
+          "${cpuavg}" "${memsum}" "${nobold}"
+        tput ed home
+        read -r _
+        get_header
       fi
     done
   )
