@@ -15,7 +15,6 @@ include:
   - .copy-tmux
   - .copy-vim
   - .copy-x11
-  - .copy-xfce
 
 {#
 Unfortunately salt.states.file does not keep permissions when using salt-ssh.

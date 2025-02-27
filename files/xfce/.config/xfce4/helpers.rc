@@ -1,9 +1,0 @@
-## SPDX-FileCopyrightText: 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
-##
-## SPDX-License-Identifier: AGPL-3.0-or-later
-# vim: ft=confini
-
-FileManager=thunar
-MailReaders=thunderbid
-WebBrowser=x-www-browser
-TerminalEmulator=x-terminal-emulator
