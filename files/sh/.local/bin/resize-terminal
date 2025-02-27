@@ -1,6 +1,6 @@
 #!/bin/sh
 
-## SPDX-FileCopyrightText: 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2024 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: GFDL-1.3-or-later
 ##
@@ -46,6 +46,12 @@ if test "${#}" -eq 0; then
   unset term_file_active
 fi
 
+sc="$(tput sc || printf '%b' '\0337')"
+rc="$(tput rc || printf '%b' '\0338')"
+cup="$(tput cup 99999 99999 || printf '%b' '\033[99999;99999H')"
+csr="$(tput csr || printf '%b' '\033[r')"
+gc="$(tput u7 || printf '%b' '\033[6n')"
+
 ## POSIX compliant.
 # shellcheck disable=SC3045
 if ! printf '%s\n' "R" | read -r -t 1 -sd R 2>/dev/null; then
@@ -58,7 +64,7 @@ if ! printf '%s\n' "R" | read -r -t 1 -sd R 2>/dev/null; then
   ## Slow due to heavy stty calls.
   termios="$(stty -g)"
   stty raw -echo min 0 time 1
-  printf '\0337\033[r\033[99999;99999H\033[6n\0338' >/dev/tty
+  printf '%s' "${sc}${csr}${cup}${gc}${rc}" >/dev/tty
   IFS='[;R' read -r _ rows cols _ </dev/tty
   stty "${termios}" cols "${cols}" rows "${rows}"
   unset termios
@@ -67,7 +73,7 @@ fi
 
 ## Non-POSIX compliant and fast.
 stty -echo
-printf '\0337\033[r\033[99999;99999H\033[6n\0338' >/dev/tty
+printf '%s' "${sc}${csr}${cup}${gc}${rc}" >/dev/tty
 # shellcheck disable=3045,SC2034
 IFS='[;R' read -r -t 1 -s -d R _ rows cols _ </dev/tty || {
   printf '%s\n' "${msg_unsupported}" >&2

@@ -111,7 +111,8 @@ has qubesctl && {
   alias qctlu="qctl --skip-dom0 --targets"
   qctlus(){
     test -n "${2-}" || return 1
-    qubesctl --skip-dom0 --targets "${1}" state.apply "${@}"
+    # shellcheck disable=SC3058
+    qubesctl --skip-dom0 --targets "${1}" state.apply "${@#"${1}"}"
   }
 }
 has gpg && alias gpgs="gpg --show-keys"
@@ -162,16 +163,19 @@ case "${TERM-}" in
   iterm|*-truecolor)
     export COLORTERM=truecolor; color_prompt=yes
     ;;
-  *-color|*-256color|linux*)
+  *-color|*-256color|linux*|vt100*|vt220*)
     color_prompt=yes
     ;;
-  ""|dumb|vt100*|vt220*)
+  ""|dumb)
     color_prompt=no
     ;;
   *)
     color_prompt=no
     ;;
 esac
+if test -n "${NO_COLOR-}"; then
+  color_prompt=no
+fi
 
 ## Colorise "ls" output.
 if test "${color_prompt-}" = "yes"; then

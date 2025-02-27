@@ -48,12 +48,34 @@ desktop_autostart(){
 
   for f in "${autostart_etc}"/*.desktop "${autostart_home}"/*.desktop; do
     test -r "${f}" || continue
+    ## TODO: check other conditions: (Not|Only)ShowIn
     # shellcheck disable=SC2091
+    autostart_hidden="$(awk -F '=' -- '/^Hidden=/{print $2}' "${f}")"
+    if test "${autostart_hidden}" = "true"; then
+      continue
+    fi
+    autostart_tryexec="$(awk -F '=' -- '/^TryExec=/{print $2}' "${f}")"
+    if test -n "${autostart_tryexec}"; then
+      case "${autostart_tryexec}" in
+        /*) test -x "${autostart_tryexec}" || continue;;
+        *) command -v "${autostart_tryexec}" >/dev/null || continue;;
+      esac
+    fi
+    autostart_path="$(awk -F '=' -- '/^Path=/{print $2}' "${f}")"
     autostart_exec="$(awk -F '=' -- '/^Exec=/{print $2}' "${f}")"
-    command -v "${autostart_exec%% *}" >/dev/null || continue
+    case "${autostart_exec}" in
+      /*) test -x "${autostart_exec}" || continue;;
+      *) command -v "${autostart_exec}" >/dev/null || continue;;
+    esac
+    if test -n "${autostart_path}"; then
+      if ! test -d "${autostart_path}"; then
+        continue
+      fi
+      cd "${autostart_path}" || continue
+    fi
     ${autostart_exec} &
   done
-  unset f
+  unset f autostart_hidden autostart_tryexec autostart_exec autostart_path
 }
 
 ## Source Xorg profiles.

@@ -124,7 +124,7 @@ if ! shopt -oq posix; then
   source_readable /usr/share/bash-completion/bash_completion
 fi
 
-unset newline ps1_symbol dircolor reset_color usercolor
+unset newline ps1_symbol dircolor usercolor
 ## }}}
 ## {{{ Plugins
 if has zoxide; then

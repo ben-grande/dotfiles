@@ -99,11 +99,11 @@ _set_title() {
 }
 
 case "${TERM-}" in
-  screen*)
+  screen*|tmux*)
     precmd() {
       _set_title "$@"
       if [ "${STY:-}" -o "${TMUX:-}" ]; then
-        # print -Pn "\033]1;\a\033]1;@%m\a"
+        print -Pn '\033]1;\a\033]1;@%m\a'
         print -Pn '\033k@\033\\'
       else
         print -Pn '\033k@%m\033\\'
