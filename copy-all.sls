@@ -1,13 +1,29 @@
 {#
-SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
+
+{%- if  salt["pillar.get"]("qusal:dotfiles:all"), default=True) or
+        salt["pillar.get"]("qusal:dotfiles:dom0") or
+        salt["pillar.get"]("qusal:dotfiles:git") or
+        salt["pillar.get"]("qusal:dotfiles:gtk") or
+        salt["pillar.get"]("qusal:dotfiles:mutt") or
+        salt["pillar.get"]("qusal:dotfiles:net") or
+        salt["pillar.get"]("qusal:dotfiles:pgp") or
+        salt["pillar.get"]("qusal:dotfiles:sh") or
+        salt["pillar.get"]("qusal:dotfiles:ssh") or
+        salt["pillar.get"]("qusal:dotfiles:tmux") or
+        salt["pillar.get"]("qusal:dotfiles:vim") or
+        salt["pillar.get"]("qusal:dotfiles:x11")
+-%}
 
 include:
   - .copy-dom0
   - .copy-git
   - .copy-gtk
+  - .copy-mutt
   - .copy-net
   - .copy-pgp
   - .copy-sh
@@ -15,6 +31,13 @@ include:
   - .copy-tmux
   - .copy-vim
   - .copy-x11
+
+{%- else -%}
+
+"{{ sls }}-was-disabled-by-pillar":
+  test.nop
+
+{%- endif -%}
 
 {#
 Unfortunately salt.states.file does not keep permissions when using salt-ssh.

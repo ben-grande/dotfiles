@@ -1,0 +1,37 @@
+{#
+SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
+SPDX-FileCopyrightText: 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+
+Example of a pillar state structure for https://github.com/ben-grande/dotfiles
+
+For this file to be active:
+
+1. Copy the file to the pillar_roots directory without the '.example' suffix;
+2. Reference this state by a pillar highstate.
+
+See the README for detailed instructions.
+
+Each pillar component is optional. Disable a single component by setting them
+to 'false'. To selectively enable few components, disable 'all' and enable
+each desired component by setting them to 'true'.
+
+Entries example: 'dom0' corresponds to 'copy-dom0.sls'.
+#}
+
+qusal:
+  dotfiles:
+    all: true
+    dom0: true
+    git: true
+    gtk: true
+    mutt: true
+    net: true
+    pgp: true
+    sh: true
+    ssh: true
+    tmux: true
+    vim: true
+    x11: true

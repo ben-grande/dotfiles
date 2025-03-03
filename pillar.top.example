@@ -1,0 +1,20 @@
+{#
+SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
+SPDX-FileCopyrightText: 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+
+Example of a pillar top structure for https://github.com/ben-grande/dotfiles
+
+For this file to be active:
+
+1. Copy the file to the pillar_roots directory without the '.example' suffix;
+2. Enable the pillar highstate.
+
+See the README for detailed instructions.
+#}
+
+base:
+  '*':
+    - qusal.dotfiles

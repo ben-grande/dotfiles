@@ -1,8 +1,12 @@
 {#
-SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
+
+{%- set qusal_dot = salt["pillar.get"]("qusal:dotfiles:all", default=True) -%}
+{%- if salt["pillar.get"]("qusal:dotfiles:x11", default=qusal_dot) -%}
 
 {%- import "dom0/gui-user.jinja" as gui_user -%}
 
@@ -27,3 +31,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     - group: root
     - keep_symlinks: True
     - force_symlinks: True
+
+{%- else -%}
+
+"{{ sls }}-was-disabled-by-pillar":
+  test.nop
+
+{%- endif %}
