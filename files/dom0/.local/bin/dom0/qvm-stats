@@ -19,6 +19,7 @@ if ! command -v sensors >/dev/null; then
 fi
 
 redraw(){
+  # shellcheck disable=SC2312
   stty size </dev/null 2>&1 >&2 | read -r LINES COLUMNS
   tput ed home
 }
@@ -44,7 +45,7 @@ get_header(){
   if test "${sensors}" != "0"; then
     sensors | grep -E -e "^(fan[1-9]+|[C|G]PU|temp[1-9]+):" |
       grep -v -e "0 RPM" -e "+0\.0.C" |
-      tr -s "\t" " " | tr "\n" "\t" | sed "s/\s\+$/\n/"
+      tr -s "\t" " " | tr "\n" "\t" | sed "s/\s\+$/\n/" || true
   fi
   printf '%s%-40s %-6s %6s   %8s%s\n' "${bold}" 'Qube' 'State' 'CPU(%)' \
     'MEM(MiB)' "${nobold}"

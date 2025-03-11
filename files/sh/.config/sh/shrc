@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## SPDX-FileCopyrightText: 2004 - 2022 Tim Pope <https://tpo.pe>
-## SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -157,27 +157,196 @@ fi
 ## }}}
 ## }}}
 ## {{{ Prompt
-## Set ability to color terminal.
-# shellcheck disable=2034
-case "${TERM-}" in
-  iterm|*-truecolor)
-    export COLORTERM=truecolor; color_prompt=yes
-    ;;
-  *-color|*-256color|linux*|vt100*|vt220*)
-    color_prompt=yes
-    ;;
-  ""|dumb)
-    color_prompt=no
-    ;;
-  *)
-    color_prompt=no
-    ;;
-esac
-if test -n "${NO_COLOR-}"; then
-  color_prompt=no
-fi
+# shellcheck disable=SC2034
+_get_term_cap(){
+  ## SGR
+  _t_colors="$(tput colors)" 2>/dev/null || true
+  _t_sgr0="$(tput sgr0)" 2>/dev/null || true
+  _t_bold="$(tput bold)" 2>/dev/null || true
+  _t_dim="$(tput dim)" 2>/dev/null || true
+  _t_sitm="$(tput sitm)" 2>/dev/null || true
+  _t_smul="$(tput smul)" 2>/dev/null || true
+  _t_blink="$(tput blink)" 2>/dev/null || true
+  _t_rev="$(tput rev)" 2>/dev/null || true
+  _t_smso="$(tput rmso)" 2>/dev/null || true
+  _t_invis="$(tput invis)" 2>/dev/null || true
+  _t_ritm="$(tput ritm)" 2>/dev/null || true
+  _t_rmul="$(tput rmul)" 2>/dev/null || true
+  _t_rmso="$(tput rmso)" 2>/dev/null || true
+  _t_setaf_0="$(tput setaf 0)" 2>/dev/null || true
+  _t_setaf_1="$(tput setaf 1)" 2>/dev/null || true
+  _t_setaf_2="$(tput setaf 2)" 2>/dev/null || true
+  _t_setaf_3="$(tput setaf 3)" 2>/dev/null || true
+  _t_setaf_4="$(tput setaf 4)" 2>/dev/null || true
+  _t_setaf_5="$(tput setaf 5)" 2>/dev/null || true
+  _t_setaf_6="$(tput setaf 6)" 2>/dev/null || true
+  _t_setaf_7="$(tput setaf 7)" 2>/dev/null || true
+  _t_setab_0="$(tput setab 0)" 2>/dev/null || true
+  _t_setab_1="$(tput setab 1)" 2>/dev/null || true
+  _t_setab_2="$(tput setab 2)" 2>/dev/null || true
+  _t_setab_3="$(tput setab 3)" 2>/dev/null || true
+  _t_setab_4="$(tput setab 4)" 2>/dev/null || true
+  _t_setab_5="$(tput setab 5)" 2>/dev/null || true
+  _t_setab_6="$(tput setab 6)" 2>/dev/null || true
+  _t_setab_7="$(tput setab 7)" 2>/dev/null || true
+  ## Movement
+  _t_ed="$(tput ed)" 2>/dev/null || true
+  _t_el="$(tput el)" 2>/dev/null || true
+  _t_home="$(tput home)" 2>/dev/null || true
+  _t_cnorm="$(tput cnorm)" 2>/dev/null || true
+  _t_civis="$(tput civis)" 2>/dev/null || true
+  _t_smcup="$(tput smcup)" 2>/dev/null || true
+  _t_rmcup="$(tput rmcup)" 2>/dev/null || true
+  _t_sc="$(tput sc)" 2>/dev/null || true
+  _t_clear="$(tput clear)" 2>/dev/null || true
+  ## Extra
+  _t_cub1="$(tput cub1)" 2>/dev/null || true
+  _t_cud1="$(tput cud1)" 2>/dev/null || true
+  _t_ind="$(tput ind)" 2>/dev/null || true
+  _t_cr="$(tput cr)" 2>/dev/null || true
+  _t_u7="$(tput u7)" 2>/dev/null || true
+  _t_u8="$(tput u8)" 2>/dev/null || true
+  _t_u9="$(tput u9)" 2>/dev/null || true
+}
 
-## Colorise "ls" output.
+_get_color_support(){
+  if test -n "${NO_COLOR-}"; then
+    color_support=-1
+    return 0
+  fi
+  case "${COLORTERM-}" in
+    truecolor|24bit)
+      color_support=$((1 << 24))
+      return 0
+      ;;
+    *) ;;
+  esac
+  if has tput; then
+    if tput RGB >/dev/null 2>&1; then
+      color_support=$((1 << 24))
+      return 0
+    fi
+    color_support=${_t_colors}
+    if test -n "${color_support}"; then
+      return 0
+    fi
+  fi
+  ## Color query from terminfo is relatively new, only available in ncurses
+  ## since 2018. Below is a match based on terminfo revision 1.909 to query
+  ## number of supported colors in case the terminfo database can't be
+  ## queried.
+  case "${TERM-}" in
+    *?-truecolor*|*?-direct*)
+      ## TODO: Some terminals such as iTerm should be in this list.
+      color_support=$((1 << 24))
+      ;;
+    *?-256color*|absolute|alacritty|Apple_Terminal|domterm|iterm|iterm2|\
+    iTerm2.app|iTerm.app|kitty|mintty|ms-terminal|nsterm|nsterm-build309|\
+    nsterm-build326|nsterm-build343|nsterm-build361|nsterm-build400|\
+    nsterm-build440|scrt|securecrt|terminator|terminology|terminology-0.6.1|\
+    terminology-1.0.0|terminology-1.8.1|termite|vscode|xterm+256setaf|\
+    xterm.js)
+      color_support=256
+      ;;
+    *?-88color*|rxvt-unicode)
+      color_support=88
+      ;;
+    hpterm-color|wy370|wy370-101k|wy370-105k|wy370-EPC|wy370-nk|wy370-rv|\
+    wy370-vb|wy370-w|wy370-wvb|wyse370)
+      color_support=64
+      ;;
+    d430c-dg-ccc|d430c-unix-25-ccc|d430c-unix-ccc|d430c-unix-s-ccc|\
+    d430c-unix-sr-ccc|d430c-unix-w-ccc|d430-dg-ccc|d430-unix-25-ccc|\
+    d430-unix-ccc|d430-unix-s-ccc|d430-unix-sr-ccc|d430-unix-w-ccc|dg+ccc|\
+    dgunix+ccc)
+      color_support=52
+      ;;
+    *?-16color*|amiga-vnc|atari-color|atari_st-color|at-color|d430c-dg|\
+    d430c-unix|d430c-unix-25|d430c-unix-s|d430c-unix-sr|d430c-unix-w|d430-dg|\
+    d430-unix|d430-unix-25|d430-unix-s|d430-unix-sr|d430-unix-w|d470|d470-7b|\
+    d470c|d470c-7b|d470c-dg|d470-dg|dg+color|dg+fixed|dgmode+color|\
+    dgunix+fixed|hp2397|hp2397a|hp+color|ncr260wy325pp|ncr260wy325wpp|\
+    ncr260wy350pp|ncr260wy350wpp|nsterm-7-c|nsterm-7-c-s|nsterm-acs-c|\
+    nsterm-acs-c-s|nsterm-bce|nsterm+c|nsterm-c|nsterm-c-7|nsterm-c-acs|\
+    nsterm-c-s|nsterm-c-s-7|nsterm-c-s-acs|st52-color|tt52|tw52|\
+    tw52-color)
+      color_support=16
+      ;;
+    *?-color*|color_xterm|386at|aixterm|alacritty+common|ansi|ansi80x25|\
+    ansi80x25-raw|ansi80x30|ansi80x43|ansi80x50|ansi80x60|ansi-emx|ansil|\
+    ansis|ansi.sys|ansi.sysk|ansisysk|ansi.sys-old|ansiw|arm100|arm100-am|\
+    arm100-w|arm100-wam|at386|aterm|att6386|beterm|bsdos-pc|bsdos-pc-nobold|\
+    bsdos-ppc|bterm|cons25|cons25-debian|cons25-iso8859|cons25-koi8-r|\
+    cons25l1|cons25r|cons25w|cons30|cons43|cons50|cons50-iso8859|\
+    cons50-koi8r|cons50l1|cons50r|cons60|cons60-iso|cons60-koi8r|cons60l1|\
+    cons60r|crt|crt-vt220|ctrm|cx|cx100|cygwin|cygwinB19|cygwinDBG|d220|\
+    d220-7b|d220-dg|d230|d230c|d230c-dg|d230-dg|darwin|darwin-100x37|\
+    darwin-112x37|darwin-128x40|darwin-128x48|darwin-144x48|darwin-160x64|\
+    darwin-200x64|darwin-200x75|darwin-256x96|darwin-80x25|darwin-80x30|\
+    darwin-90x30|darwin-b|darwin-f|darwin-f2|decansi|djgpp|djgpp204|dtterm|\
+    dumb-emacs-ansi|dvtm|emots|emx-base|Eterm|gnome|gnome-2007|gnome-2008|\
+    gnome-2012|gnome-fc5|gnome-rh62|gnome-rh72|gnome-rh80|gnome-rh90|gs6300|\
+    hft|hft-c|hft-c-old|hft-old|hterm|hurd|i3164|ibm3164|ibm5081|ibm5154|\
+    ibm6154|ibm8503|ibm8507|ibm8512|ibm8513|ibm8514|ibm8604|ibmpc3|ibmpc3r|\
+    interix|interix-nti|jaixterm|jfbterm|kon|kon2|konsole|konsole-base|\
+    konsole-linux|konsole-solaris|konsole-vt100|konsole-vt420pc|konsole-xf3x|\
+    konsole-xf4x|kterm|kterm-co|kvt|linux|linux2.2|linux2.6|linux2.6.26|\
+    linux3.0|linux-basic|linux-c|linux-c-nc|linux-koi8|linux-koi8r|linux-lat|\
+    linux-m1|linux-nic|linux-s|linux-vt|mgt|mgterm|minitel1|minitel1b|minix|\
+    minix-3.0|mintty+common|mlterm|mlterm2|mlterm3|mosh|mrxvt|ms-vt100+|\
+    ms-vt-utf8|mvterm|nansi.sys|nansisys|nansi.sysk|nansisysk|ncr260intan|\
+    ncr260intpp|ncr260intwan|ncr260intwpp|ncsa|ncsa-ns|ncsa-vt220|netbsd6|\
+    nsterm-7|nsterm-7-s|nsterm-acs|nsterm-acs-s|nsterm+c41|nsterm-old|\
+    nsterm-s|nsterm-s-7|nsterm-s-acs|ntconsole|ntconsole-100|\
+    ntconsole-100-nti|ntconsole-25|ntconsole-25-nti|ntconsole-25-w|\
+    ntconsole-25-w-vt|ntconsole-35|ntconsole-35-nti|ntconsole-35-w|\
+    ntconsole-50|ntconsole-50-nti|ntconsole-50-w|ntconsole-60|\
+    ntconsole-60-nti|ntconsole-60-w|ntconsole-w|ntconsole-w-vt|nxterm|old-st|\
+    opennt|opennt-100|opennt-100-nti|opennt-25|opennt-25-nti|opennt-25-w|\
+    opennt-25-w-vt|opennt-35|opennt-35-nti|opennt-35-w|opennt-50|\
+    opennt-50-nti|opennt-50-w|opennt-60|opennt-60-nti|opennt-60-w|opennt-nti|\
+    opennt-w|opennt-w-vt|pc3|pc3-bold|pc3r|pcansi|pcansi-25|pcansi25|\
+    pcansi-33|pcansi33|pcansi-43|pcansi43|pccon|pccon0|pc-minix|putty|\
+    putty-m1|putty-noapp|putty-sco|putty-screen|putty-vt100|qansi|qansi-g|\
+    qansi-m|qansi-t|qansi-w|qnx|qnx4|qnxm|qnxt|qnxt2|qnxt4|qnxw|rxvt|\
+    rxvt-cygwin|rxvt-cygwin-native|rxvt-xpm|scoansi|scoansi-new|scoansi-old|\
+    screen|screen4|screen5|screen-base|screen-bce|screen-bce.Eterm|\
+    screen-bce.gnome|screen-bce.konsole|screen-bce.linux|screen-bce.mrxvt|\
+    screen-bce.rxvt|screen-bce.xterm-new|screen.Eterm|screen.gnome|\
+    screen.konsole|screen.linux|screen.linux-m1|screen.linux-s|\
+    screen.minitel1|screen.minitel1b|screen.mlterm|screen.mrxvt|screen.putty|\
+    screen.putty-m1|screen.rxvt|screen-s|screen.teraterm|screen.vte|screen-w|\
+    screen.xterm-new|screen.xterm-xfree86|simpleterm|st|st-0.6|st-0.7|st-0.8|\
+    stterm|tek4205|teken|teken-2018|teken-2022|teken-sc|teken-vt|teraterm|\
+    teraterm2.3|teraterm4.59|teraterm4.97|ti928|ti928-8|ti_ansi|tmux|tw100|\
+    uwin|vt100+|vte|vte-2007|vte-2008|vte-2012|vte-2014|vte-2017|vte-2018|\
+    vtnt|vt-utf8|vv100|vwmterm|wsvt25|wsvt25m|wy350|wy350-vb|wy350-w|\
+    wy350-wvb|wyse350|wyse350-vb|wyse350-w|wyse350-wvb|xfce|xiterm|xnuppc|\
+    xnuppc-100x37|xnuppc-112x37|xnuppc-128x40|xnuppc-128x48|xnuppc-144x48|\
+    xnuppc-160x64|xnuppc-200x64|xnuppc-200x75|xnuppc-256x96|xnuppc-80x25|\
+    xnuppc-80x30|xnuppc-90x30|xnuppc-b|xnuppc+c|xnuppc-f|xnuppc-f2|xterm|\
+    xterm1|xterm-1002|xterm-1003|xterm-1005|xterm-1006|xterm-8bit|\
+    xterm-basic|xtermc|xterm-debian|xterm-hp|xterm-new|xterm-nic|xterm-noapp|\
+    xterm+nofkeys|xterm-p370|xterm-p371|xterm-sco|xterms-sun|xterm-sun|\
+    xterm-utf8|xterm-vt220|xterm-x10mouse|xterm-x11hilite|xterm-x11mouse|\
+    xterm-xf86-v32|xterm-xf86-v33|xterm-xf86-v333|xterm-xf86-v40|\
+    xterm-xf86-v43|xterm-xf86-v44|xterm-xfree86|xterm-xi|xwsh)
+      color_support=8
+      ;;
+    *)
+      color_support=-1
+      ;;
+  esac
+}
+
+_get_term_cap
+_get_color_support
+case "${color_support}" in
+  $((1 << 24))) export COLORTERM=truecolor; color_prompt=yes;;
+  [1-9]*) color_prompt=yes;;
+  *) color_prompt=no;;
+esac
+
 if test "${color_prompt-}" = "yes"; then
   if has dircolors; then
     ## Use dircolors if available.
@@ -192,7 +361,8 @@ if test "${color_prompt-}" = "yes"; then
     ## Fix bold on some terminals.
     case "${TERM-}" in
       xterm*|screen*)
-        LS_COLORS="$(printf '%s\n' "${LS_COLORS}" | sed -e 's/01;3/00;9/g')"
+        LS_COLORS="$(printf '%s' "${LS_COLORS}" |
+                      sed -e 's/01;3\([0-9]\)/00;9\1/g')"
         ;;
       *) ;;
     esac
@@ -203,22 +373,21 @@ if test "${color_prompt-}" = "yes"; then
     export CLICOLOR CLICOLOR_FORCE LSCOLORS
   fi
 
-  ## Set gcc colors.
   GCC_COLORS="error=00;31:warning=01;35:note=01;36:caret=01;32:locus=01"
   GCC_COLORS="${GCC_COLORS}:quote=01"
   export GCC_COLORS
 
-  ## Colors for programs that uses less such as 'man'.
+  ## Colors for programs that uses 'less' such as 'man'.
   GROFF_NO_SGR=1
-  LESS_TERMCAP_mb="$(tput bold; tput setaf 2)"     # begin blink
-  LESS_TERMCAP_md="$(tput bold; tput setaf 6)"     # begin bold
-  LESS_TERMCAP_me="$(tput sgr0)"                   # reset bold/blink
-  LESS_TERMCAP_so="$(tput bold; tput setaf 7; tput setab 4)" # begin rev video
-  LESS_TERMCAP_se="$(tput rmso; tput sgr0)"        # reset rev video
-  LESS_TERMCAP_us="$(tput smul; tput bold; tput setaf 2)"    # begin underline
-  LESS_TERMCAP_ue="$(tput rmul; tput sgr0)"        # reset underline
-  LESS_TERMCAP_mr="$(tput rev)"                    # revert
-  LESS_TERMCAP_mh="$(tput dim)"                    # dimerize
+  LESS_TERMCAP_mb="${_t_bold}${_t_setaf_2}"
+  LESS_TERMCAP_md="${_t_bold}${_t_setaf_6}"
+  LESS_TERMCAP_me="${_t_sgr0}"
+  LESS_TERMCAP_so="${_t_bold}${_t_setaf_7}${_t_setab_4}"
+  LESS_TERMCAP_se="${_t_rmso}${_t_sgr0}"
+  LESS_TERMCAP_us="${_t_smul}${_t_bold}${_t_setaf_2}"
+  LESS_TERMCAP_ue="${_t_rmul}${_t_sgr0}"
+  LESS_TERMCAP_mr="${_t_rev}"
+  LESS_TERMCAP_mh="${_t_dim}"
   export GROFF_NO_SGR
   export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_me
   export LESS_TERMCAP_so LESS_TERMCAP_se LESS_TERMCAP_us
@@ -246,46 +415,46 @@ _git_prompt_info(){
     ref="$(git describe --tags --exact-match HEAD 2>/dev/null)"
   test "${ref-}" || ref="$(git rev-parse HEAD 2>/dev/null | cut -c 1-7)"
   test "${ref-}" || return
-  # shellcheck disable=2039,3003
-  case "${TERM-}" in
-    *-256color|xterm-kitty) branchcolor=$'\033[38;5;31m' ;;
-    *-88color|rxvt-unicode) branchcolor=$'\033[38;5;22m' ;;
-    *) branchcolor=$'\033[0;94m' ;;
+  case "${color_support-}" in
+    256|$((1 << 24))) branchcolor="$(printf '%b' "\033[38;5;31m")";;
+    88) branchcolor="$(printf '%b' "\033[38;5;22m")";;
+    [1-9]*) branchcolor="${_t_bold}${_t_setaf_4}";;
+    *) branchcolor="";;
   esac
   if test -n "${ZSH_VERSION-}"; then
     # shellcheck disable=2016
     if test "${color_prompt-}" = "yes"; then
-      print -Pn '(%%{${branchcolor}%%}%20>...>${ref}%<<%%{\033[0m%%})'
+      print -Pn '(%%{${branchcolor}%%}%20>...>${ref}%<<%%{${_t_sgr0}%%})'
     else
       print -Pn '(%20>...>${ref}%<<)'
     fi
   else
     if test "${color_prompt-}" = "yes"; then
-      printf '%s' "(${branchcolor}${ref}${reset_color})"
+      printf '%s' "(${branchcolor}${ref}${_t_sgr0})"
     else
       printf '%s' "(${ref})"
     fi
   fi
-  unset ref
+  unset ref branchcolor
 }
 
 # shellcheck disable=SC2034
-reset_color="$(printf '%b' '\033[0m')"
-
-# shellcheck disable=SC2034
-## Use echotc Co? Only available by default for zsh, not bash.
-case "${TERM-}" in
-  *-256color|xterm-kitty)
+case "${color_support-}" in
+  256|$((1 << 24)))
     usercolor="$(printf '%b' "\033[38;5;184m")"
     dircolor="$(printf '%b' "\033[38;5;27m")"
     ;;
-  *-88color|rxvt-unicode)
+  88)
     usercolor="$(printf '%b' "\033[38;5;56m")"
     dircolor="$(printf '%b' "\033[38;5;23m")"
     ;;
+  [1-9]*)
+    usercolor="${_t_bold}${_t_setaf_3}"
+    dircolor="${_t_bold}${_t_setaf_4}"
+    ;;
   *)
-    usercolor="$(printf '%b' "\033[0;93m")"
-    dircolor="$(printf '%b' "\033[1;34m")"
+    usercolor=""
+    dircolor=""
     ;;
 esac
 
@@ -297,16 +466,14 @@ esac
 # shellcheck disable=SC2034
 uid="$(id -u)"
 if test "${uid}" = "0"; then
-  usercolor="$(printf '%b' "\033[0;97m")"
+  usercolor="${_t_bold}${_t_setaf_7}"
   ps1_symbol="#"
 fi
 unset uid
 
-## Do not colorize this prompt, Sh fails to count the correct number of
-## characters on the prompt leading to problems.
 user="$(id -un)"
 if test "${color_prompt-}" = "yes"; then
-  PS1="[${usercolor}${user} $(hostname -s)${reset_color}]${ps1_symbol} "
+  PS1="[${usercolor}${user} $(hostname -s)${_t_sgr0}]${ps1_symbol} "
 else
   PS1="${user}@$(hostname -s)${ps1_symbol} "
 fi

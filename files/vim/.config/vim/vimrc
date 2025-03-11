@@ -1,5 +1,5 @@
 " SPDX-FileCopyrightText: 2004 - 2022 Tim Pope <https://tpo.pe>
-" SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+" SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 "
 " SPDX-License-Identifier: Vim
 "
@@ -556,6 +556,9 @@ if (&t_Co > 2 || has('gui_running')) && has('syntax')
   endif
   if has('vim_starting')
     set list
+    if has('termguicolors') && &t_Co > 256
+      setglobal termguicolors
+    endif
     if !exists('g:colors_name')
       colorscheme vividchalk
     endif

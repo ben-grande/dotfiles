@@ -14,8 +14,10 @@ if test -n "${TERM_RESIZE_DISABLE:-}"; then
 fi
 
 test -t 0 || exit 0
-
-msg_unsupported="error: cannot resize screen: unsupported terminal emulator"
+case "${TERM-}" in
+  dumb) exit 0;;
+  *);;
+esac
 
 ## If argument is provided, allow user to bypass tty check.
 if test "${#}" -eq 0; then
@@ -46,15 +48,17 @@ if test "${#}" -eq 0; then
   unset term_file_active
 fi
 
-sc="$(tput sc || printf '%b' '\0337')"
-rc="$(tput rc || printf '%b' '\0338')"
-cup="$(tput cup 99999 99999 || printf '%b' '\033[99999;99999H')"
-csr="$(tput csr || printf '%b' '\033[r')"
-gc="$(tput u7 || printf '%b' '\033[6n')"
+get_caps(){
+  sc="$(tput sc || printf '%b' '\0337')"
+  rc="$(tput rc || printf '%b' '\0338')"
+  cup="$(tput cup 99999 99999 || printf '%b' '\033[99999;99999H')"
+  csr="$(tput csr || printf '%b' '\033[r')"
+  gc="$(tput u7 || printf '%b' '\033[6n')"
+}
 
 ## POSIX compliant.
 # shellcheck disable=SC3045
-if ! printf '%s\n' "R" | read -r -t 1 -sd R 2>/dev/null; then
+if ! (printf '%s\n' "R" | read -r -t 1 -sd R 2>/dev/null); then
   ## Fast but depends on XTerm.
   if has resize; then
     resize_cmd="$(resize)"
@@ -62,6 +66,7 @@ if ! printf '%s\n' "R" | read -r -t 1 -sd R 2>/dev/null; then
     exit 0
   fi
   ## Slow due to heavy stty calls.
+  get_caps
   termios="$(stty -g)"
   stty raw -echo min 0 time 1
   printf '%s' "${sc}${csr}${cup}${gc}${rc}" >/dev/tty
@@ -71,7 +76,9 @@ if ! printf '%s\n' "R" | read -r -t 1 -sd R 2>/dev/null; then
   exit 0
 fi
 
+msg_unsupported="error: cannot resize screen: unsupported terminal emulator"
 ## Non-POSIX compliant and fast.
+get_caps
 stty -echo
 printf '%s' "${sc}${csr}${cup}${gc}${rc}" >/dev/tty
 # shellcheck disable=3045,SC2034

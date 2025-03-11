@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -60,15 +60,17 @@ _reset_line() {
   ## On pending input, assume it's been echoed and we're not in first column.
   ## Otherwise ask the terminal for current column and read it from input.
   if read -t 0 || {
-    IFS='[;' read -s -r -d'R' -p$'\033[6n' _ _ cur_y && [[ ${cur_y} != 1 ]]
+    # shellcheck disable=SC2154
+    IFS='[;' read -s -r -d'R' -p "${_t_u7}" _ _ cur_y && [[ ${cur_y} != 1 ]]
   }
   then
     unset cur_y
     ## Print line ending char with reversed video and end with newline.
     if test "${color_prompt-}" = "yes"; then
-      printf '%b' "\033[41m\033[0m\033[7m%\033[0m\n\r"
+      # shellcheck disable=SC2154
+      printf '%s\n\r' "${_t_sgr0}${_t_rev}%${_t_sgr0}"
     else
-      printf '%b' "%\n\r"
+      printf '%s\n\r' "%"
     fi
   fi
 }
@@ -76,9 +78,11 @@ _reset_line() {
 _print_ec(){
   test "${_ec_ps1}" = "0" && return
   if test "${color_prompt:-}" = "yes"; then
-    printf '%b%s%b' "(\001\033[31m\002" "${_ec_ps1}" "\001\033[0m\002)"
+    # shellcheck disable=SC2154
+    printf '(\001%s\002%s\001%s\002)' "${_t_setaf_1}" "${_ec_ps1}" \
+      "${_t_sgr0}"
   else
-    printf '%s' "(${_ec_ps1})"
+    printf '(%s)' "${_ec_ps1}"
   fi
   unset _ec_ps1
 }
@@ -90,10 +94,10 @@ newline=$'\n'
 # shellcheck disable=SC2154
 if test "${color_prompt:-}" = "yes"; then
   # shellcheck disable=SC2154
-  PS1="\$(_reset_line)\$(resize-terminal)\[\033[35m\][\[${reset_color}\]"
+  PS1="\$(_reset_line)\$(resize-terminal)\[${_t_setaf_5}\][\[${_t_sgr0}\]"
   PS1="${PS1}${debian_chroot:+(${debian_chroot})}\[${usercolor}\]\u@\h "
-  PS1="${PS1}\[${dircolor}\]\w\[${reset_color}\]\$(_git_prompt_info)"
-  PS1="${PS1}\[\033[35m\]]\[${reset_color}\]${newline-}\$(_print_ec)"
+  PS1="${PS1}\[${dircolor}\]\w\[${_t_sgr0}\]\$(_git_prompt_info)"
+  PS1="${PS1}\[${_t_setaf_5}\]]\[${_t_sgr0}\]${newline-}\$(_print_ec)"
   PS1="${PS1}${ps1_symbol} "
 else
   PS1="\$(_reset_line)\$(resize-terminal)"

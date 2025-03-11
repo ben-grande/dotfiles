@@ -1,15 +1,14 @@
 ! ~/.Xresources
-
+! vim:set foldmethod=expr foldexpr=getline(v\:lnum)=~'^!##'?'>1'\:'=':
 ! SPDX-FileCopyrightText: 2004 - 2016 Tim Pope <https://tpo.pe>
-! SPDX-FileCopyrightText: 2023 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+! SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 !
 ! SPDX-License-Identifier: AGPL-3.0-or-later
-
+!
 ! Credits: https://github.com/tpope/dotfiles/blob/master/.Xresources
-! vim:set foldmethod=expr foldexpr=getline(v\:lnum)=~'^!##'?'>1'\:'=':
 
 *international: true
-*customization:     -color
+*customization: -color
 
 !## TERMINAL COMMON
 #ifndef FIXED
@@ -24,100 +23,6 @@
 #endif
 #endif
 
-! http://www.calmar.ws/vim/256-xterm-24bit-rgb-color-chart.html
-! https://en.wikipedia.org/wiki/X11_color_names
-! https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
-! RGB to HEX https://unix.stackexchange.com/a/269085
-! https://misc.flogisoft.com/bash/tip_colors_and_formatting
-! https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
-! https://unix.stackexchange.com/questions/124407/what-color-codes-can-i-use-in-my-bash-ps1-prompt
-
-! name    dark  light
-! black    0      8
-! red      1      9
-! green    2     10
-! yellow   3     11
-! blue     4     12
-! purple   5     13
-! cyan     6     14
-! white    7     15
-
-! Tpope colors
-*color0:  #000000
-*color1:  #aa0000
-*color2:  #00aa00
-*color3:  #aa5522
-*color4:  #0000ee
-*color5:  #aa00aa
-*color6:  #00aaaa
-*color7:  #aaaaaa
-*color8:  #555555
-*color9:  #ff4444
-*color10: #44ff44
-*color11: #ffff00
-*color12: #5c5cff
-*color13: #ff00ff
-*color14: #00ffff
-*color15: #ffffff
-*colorBD: #ffffff
-
-! *.cursorColor:  #ffffff
-
-! *color0:  #000000
-! *color1:  #aa0000
-! *color2:  #00aa00
-! *color3:  #aa5522
-! *color4:  #0000ee
-! *color5:  #aa00aa
-! *color6:  #00aaaa
-! *color7:  #aaaaaa
-! *color8:  #555555
-! *color9:  #ff4444
-! *color10: #44ff44
-! *color11: #ffff00
-! *color12: #5c5cff
-! *color13: #ff00ff
-! *color14: #00ffff
-! *color15: #ffffff
-! *colorBD: #ffffff
-
-! ! Black / Grey
-! *.color0:       #000000
-! ! *.color8:       #808080
-! *.color8:       #767676
-
-! ! Red / Bright Red
-! *.color1:       #800000
-! *.color9:       #FF0000
-
-! ! Green + Bright Green
-! ! *.color2:       #008000
-! *.color2:       #00af00
-! *.color10:      #00ff00
-
-! ! Yellow (Orange) + Bright Yellow (Yellow)
-! *.color3:       #808000
-! *.color11:      #ffff00
-
-! ! Blue + Bright Blue
-! *.color4:       #000080
-! *.color12:      #0000ff
-
-! ! Magenta (Purple) + Bright Magenta
-! ! *.color5:       #800080
-! *.color5:       #af00d7
-! *.color13:      #0000ff
-
-! ! Cyan (Aqua) + Bright Cyan
-! ! *.color6:       #800080
-! *.color6:       #008b8b
-! ! *.color14:      #ff00ff
-! *.color14:      #00d7ff
-
-! ! Light Grey (Selection) + White (Current Line)
-! *.color7:       #c0c0c0
-! *.color15:      #ffffff
-
 !## [U]XTERM
 *.selectToClipboard: true
 *.VT100saveLines:    4096
@@ -129,16 +34,20 @@
 *.VT100.background:  black
 *.foreground:        white
 *.VT100.foreground:  white
-*.termName:    xterm-256color
+*.termName:    xterm-direct256
 *.ttyModes:    start ^- stop ^-
 *.boldMode:    false
 *.allowBoldFonts: false
+*.colorMode: true
+*.dynamicColors: true
+*.colorBDMode: false
+*.colorULMode: false
+*.underline: false
 *.VT100.geometry: 80x24
 *.VT100.scaleHeight: 1.1
 ! For some reason, '*scrollBar' was not working on Fedora.
 XTerm*.scrollBar: false
 UXTerm*.scrollBar: false
-*.colorBDMode: true
 *.visualBell: false
 *.eightBitInput: false
 *.modifyCursorKeys: 2

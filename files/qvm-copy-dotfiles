@@ -1,6 +1,6 @@
 #!/bin/sh
 ##
-## SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 ##
@@ -28,14 +28,14 @@ test -f ./setup.sh ||
 
 if test "${qube}" = "dom0"; then
   sh ./dotfiles/setup.sh
-  user_name="$(getent group qubes | awk -F "[:,]" '{print $4}')"
-  user_home="$(getent passwd "${user_name}" | awk -F ":" '{print $6}')"
-  sudo -u "${user_name}" mkdir -pv -- "${user_home}/.cache"
-  tmpdir="$(sudo -u "${user_name}" -- mktemp -d -- "${user_home}/.cache/XXXXXX")"
+  user="$(getent group qubes | awk -F "[:,]" '{print $4}')"
+  home="$(getent passwd "${user}" | awk -F ":" '{print $6}')"
+  sudo -u "${user}" mkdir -pv -- "${home}/.cache"
+  tmpdir="$(sudo -u "${user}" -- mktemp -d -- "${home}/.cache/XXXXXX")"
   trap 'rm -rf -- "${tmpdir}"' EXIT INT HUP QUIT ABRT
   cp -r -- ./dotfiles "${tmpdir}"
-  chown -R -- "${user_name}:${user_name}" "${tmpdir}"
-  sudo -u "${user_name}" -- "${tmpdir}/dotfiles/setup.sh"
+  chown -R -- "${user}:${user}" "${tmpdir}"
+  sudo -u "${user}" -- "${tmpdir}/dotfiles/setup.sh"
   exit
 fi
 

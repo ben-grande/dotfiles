@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 ## SPDX-FileCopyrightText: 2004 - 2022 Tim Pope <https://tpo.pe>
-## SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -20,6 +20,7 @@ source "$HOME/.zprofile"
 source "$ENV"
 ## }}}
 ## {{{ Options
+PROMPT_EOL_MARK='%b%B%S%#%s%b'
 ## - Quiet
 setopt no_beep
 ## - Words
@@ -74,10 +75,10 @@ if test "${color_prompt-}" = "yes"; then
   [[ "${COLORTERM-}" == (24bit|truecolor) ||
     "${terminfo[colors]}" -eq '16777216' ]] || zmodload zsh/nearcolor
 
-  PS1="\$(resize-terminal)%F{magenta}[%{$usercolor%}%n@%m%F{reset_color%}"
+  PS1="\$(resize-terminal)%F{magenta}[%{${usercolor}%}%n@%m%F{reset_color%}"
   PS1="${PS1} %{$dircolor%}%50<...<%~%<<%F{reset_color%}\$(_git_prompt_info)"
   PS1="${PS1}%F{magenta}]%F{reset_color}${newline-}${ps1_symbol} "
-  RPS1="%(?..(%{"$'\033[31m'"%}%?%{$reset_color%}%)%<<)"
+  RPS1="%(?..(%F{red%}%?%F{reset_color%}%)%<<)"
 else
   PS1="\$(resize-terminal)[%n@%M %~\$(_git_prompt_info)]${newline}"
   PS1="${PS1}${ps1_symbol} "
@@ -103,7 +104,6 @@ case "${TERM-}" in
     precmd() {
       _set_title "$@"
       if [ "${STY:-}" -o "${TMUX:-}" ]; then
-        print -Pn '\033]1;\a\033]1;@%m\a'
         print -Pn '\033k@\033\\'
       else
         print -Pn '\033k@%m\033\\'
@@ -111,17 +111,17 @@ case "${TERM-}" in
     }
     preexec() {
       _set_title "$@"
-      print -n "\033k"
-      print -Pnr '%10>..>$1' | tr '\0-\037' '?'
-      if [ "${STY:-}" -o "${TMUX:-}" ]; then
-        print -Pn '@\033\\'
-      else
-        print -Pn '@%m\033\\'
-      fi
+      return 0
+      #print -Pnr '%10>..>$1' | tr '\0-\037' '?'
+      #if [ "${STY:-}" -o "${TMUX:-}" ]; then
+      #  print -Pn '\033k@\033\\'
+      #else
+      #  print -Pn '\033k@%m\033\\'
+      #fi
     }
   ;;
 
-  xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
+  *?-direct*|xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
     precmd () { _set_title "$@" }
     preexec() { _set_title "$@" }
     ;;
@@ -134,8 +134,8 @@ case "${TERM-}" in
     ;;
 esac
 
-unset hostcolor hostletter hostcode dircolor usercolor usercode reset_color \
-      newline ps1_symbol
+unset hostcolor hostletter hostcode dircolor usercolor usercode newline \
+      ps1_symbol
 ## }}}
 ## {{{ Completions
 
@@ -224,9 +224,10 @@ if test "${color_prompt-}" = "yes"; then
   ## Enable auto-suggestions based on the history
   if test -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh; then
     ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
-    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=7,bg=8,underline"
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="standout"
     typeset -a ZSH_AUTOSUGGEST_CLEAR_WIDGETS
-    ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(bracketed-paste)
+    ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+    ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(bracketed-paste accept-line)
     source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
   fi
   ## Highlight commands as you type
@@ -236,7 +237,6 @@ if test "${color_prompt-}" = "yes"; then
     ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern regexp)
     typeset -A ZSH_HIGHLIGHT_STYLES
     ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=red'
-    ZSH_HIGHLIGHT_STYLES[default]='fg=white'
     ZSH_HIGHLIGHT_STYLES[alias]='fg=cyan'
     ZSH_HIGHLIGHT_STYLES[function]='fg=cyan'
     ZSH_HIGHLIGHT_STYLES[builtin]='fg=green'
