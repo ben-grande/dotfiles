@@ -20,17 +20,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -%}
 
 include:
-  - .copy-dom0
-  - .copy-git
-  - .copy-gtk
-  - .copy-mutt
-  - .copy-net
-  - .copy-pgp
-  - .copy-sh
-  - .copy-ssh
-  - .copy-tmux
-  - .copy-vim
-  - .copy-x11
+  - {{ slsdotpath }}.copy-dom0
+  - {{ slsdotpath }}.copy-git
+  - {{ slsdotpath }}.copy-gtk
+  - {{ slsdotpath }}.copy-mutt
+  - {{ slsdotpath }}.copy-net
+  - {{ slsdotpath }}.copy-pgp
+  - {{ slsdotpath }}.copy-sh
+  - {{ slsdotpath }}.copy-ssh
+  - {{ slsdotpath }}.copy-tmux
+  - {{ slsdotpath }}.copy-vim
+  - {{ slsdotpath }}.copy-x11
 
 {%- else -%}
 
