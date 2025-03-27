@@ -1,16 +1,20 @@
 #!/bin/sh
 
-## SPDX-FileCopyrightText: 2023 - 2024 Benjamin Grande M. S. <ben.grande.b@gmail.com>
+## SPDX-FileCopyrightText: 2023 - 2025 Benjamin Grande M. S. <ben.grande.b@gmail.com>
 ##
 ## SPDX-License-Identifier: AGPL-3.0-or-later
 
 set -eu
 
 if command -v delta >/dev/null; then
-  exec delta "${@}"
+  exec delta -- "${@}"
 else
   : "${DIFF_HIGHLIGHT_SOURCE:=/usr/share/doc/git/contrib/diff-highlight}"
   : "${DIFF_HIGHLIGHT_EXEC:=/usr/share/git-core/contrib/diff-highlight}"
+
+  git_less(){
+    exec less -RS -- "${@}"
+  }
 
   ## Debian.
   if command -v perl >/dev/null &&
@@ -18,13 +22,14 @@ else
     test -f "${DIFF_HIGHLIGHT_SOURCE}/diff-highlight.perl"
   then
     exec perl -I "${DIFF_HIGHLIGHT_SOURCE}" -MDiffHighlight -- \
-      "${DIFF_HIGHLIGHT_SOURCE}/diff-highlight.perl" | less -RS
-
+      "${DIFF_HIGHLIGHT_SOURCE}/diff-highlight.perl" | git_less
+    exit
   ## Fedora.
   elif command -v perl >/dev/null && test -f "${DIFF_HIGHLIGHT_EXEC}"
   then
-    exec "${DIFF_HIGHLIGHT_EXEC}" | less -RS
+    exec "${DIFF_HIGHLIGHT_EXEC}" | git_less
+    exit
   fi
 
-  exec less -RS "${@}"
+  git_less "${@}"
 fi
