@@ -297,6 +297,7 @@ nnoremap <silent> <C-w>z :wincmd z<Bar>cclose<Bar>lclose<CR>
 nnoremap <silent> <C-w>Q :tabclose<CR>
 nnoremap <silent> <C-w>, :if exists(':Wcd')<Bar>exe 'Wcd'<Bar>elseif exists(':Lcd')<Bar>exe 'Lcd'<Bar>elseif exists(':Glcd')<Bar>exe 'Glcd'<Bar>else<Bar>lcd %:h<Bar>endif<CR>
 nmap cd <C-w>,
+
 nnoremap <leader>sf :Files<CR>
 nnoremap <leader>sg :Rg<CR>
 
@@ -569,7 +570,7 @@ if (&t_Co > 2 || has('gui_running')) && has('syntax')
   autocmd Syntax sh   syn sync minlines=500
   autocmd Syntax css  syn sync minlines=50
   " Fix syntax highlighting
-  " autocmd BufEnter * syntax sync fromstart
+  autocmd BufEnter * syntax sync fromstart
 endif
 
 " Highlight textwdith+1.
@@ -577,37 +578,6 @@ let g:tw_hi_till_end = 0
 let g:tw_hi_exclude_filetype = [
   \ 'help', 'netrw', 'qrexecpolicy', 'qrexecpolicyservice', 'qrexecconfig'
   \ ]
-function! TextwidthHighlight()
-  if !exists('s:tw_leave')
-    let s:tw_leave = 0
-  endif
-  if s:tw_leave == 1
-    return
-  endif
-
-  if !exists('g:tw_hi_exclude_filetype')
-    let g:tw_hi_exclude_filetype = []
-  endif
-  if !exists('g:tw_hi_till_end')
-    let g:tw_hi_till_end = 0
-  endif
-  for ft in g:tw_hi_exclude_filetype
-    if &filetype ==# ft
-      return
-    endif
-  endfor
-  if exists('b:tw_match')
-    try | call matchdelete(b:tw_match) | catch | endtry
-    unlet b:tw_match
-  endif
-  if &textwidth == 0 | return | endif
-  if g:tw_hi_till_end == 1
-    let b:tw_match = matchadd('ColorColumn', '.\{' . (&textwidth+1) . '\}\zs.\+', 100)
-  else
-    let b:tw_match = matchadd('ColorColumn', '\%' . (&textwidth+1) . 'v', 100)
-  endif
-endfunction
-autocmd BufEnter,BufWritePre,OptionSet,ColorScheme * call TextwidthHighlight()
 " Fix for netrw when opening a directory, entering a file than exiting it.
 autocmd VimLeave * let s:tw_leave = 1
 
