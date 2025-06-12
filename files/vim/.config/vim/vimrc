@@ -169,7 +169,7 @@ endfunction
 
 autocmd VimEnter * if !has('gui_running') | set noicon background=dark | endif
 autocmd GUIEnter * set background=light icon guioptions-=T guioptions-=m guioptions-=e guioptions-=r guioptions-=L
-autocmd GUIEnter * silent! colorscheme vividchalk
+autocmd GUIEnter * silent! colorscheme quiet
 autocmd GUIEnter * let &g:guifont = substitute(&g:guifont, '^$', s:font(), '')
 autocmd FocusLost * let s:confirm = &confirm | setglobal noconfirm | silent! wall | let &confirm = s:confirm
 
@@ -297,6 +297,8 @@ nnoremap <silent> <C-w>z :wincmd z<Bar>cclose<Bar>lclose<CR>
 nnoremap <silent> <C-w>Q :tabclose<CR>
 nnoremap <silent> <C-w>, :if exists(':Wcd')<Bar>exe 'Wcd'<Bar>elseif exists(':Lcd')<Bar>exe 'Lcd'<Bar>elseif exists(':Glcd')<Bar>exe 'Glcd'<Bar>else<Bar>lcd %:h<Bar>endif<CR>
 nmap cd <C-w>,
+nnoremap <leader>sf :Files<CR>
+nnoremap <leader>sg :Rg<CR>
 
 " Paste last thing yanked
 nnoremap ,p "0p
@@ -532,17 +534,17 @@ autocmd BufWritePre,FileWritePre /etc/* if &ft == 'dns' |
 
 " Section: Highlighting
 
-if has('spell')
-  if has('vim_starting')
-    call mkdir($CODE_HOME."/vim/after/spell", 'p', 0700)
-    set spell
-    set spelllang=en_us
-    set spellfile=$CODE_HOME/vim/after/spell/en.utf-8.add
-  endif
-  let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
-  autocmd FileType gitcommit,markdown,vimwiki,mail,text setlocal spell
-  autocmd FileType help if &buftype ==# 'help' | setlocal nospell | endif
-endif
+" if has('spell')
+"   if has('vim_starting')
+"     call mkdir($CODE_HOME."/vim/after/spell", 'p', 0700)
+"     set spell
+"     set spelllang=en_us
+"     set spellfile=$CODE_HOME/vim/after/spell/en.utf-8.add
+"   endif
+"   let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
+"   autocmd FileType gitcommit,markdown,vimwiki,mail,text setlocal spell
+"   autocmd FileType help if &buftype ==# 'help' | setlocal nospell | endif
+" endif
 
 if $TERM !~? 'linux' && &t_Co == 8
   setglobal t_Co=16
@@ -560,7 +562,7 @@ if (&t_Co > 2 || has('gui_running')) && has('syntax')
       setglobal termguicolors
     endif
     if !exists('g:colors_name')
-      colorscheme vividchalk
+      colorscheme quiet
     endif
   endif
 

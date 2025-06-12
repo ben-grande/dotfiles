@@ -12,6 +12,11 @@
 	; https://github.com/schacon/gitscm/tree/master
 	; Abbreviations
 	co = checkout
+	fs = "!git commit && git tag current-feature HEAD"
+	qf = "!git add . && git commit --fixup=current-feature"
+	qc = "!git add . && git commit"
+	fr = "!git commit --amend current-feature"
+	ff = "!git rebase -i --autosquash current-feature~1 && git tag -d current-feature"
 	br = branch
 	sw = switch
 	st = status
