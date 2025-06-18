@@ -5,7 +5,7 @@ SPDX-FileCopyrightText: 2024 seven-beep <ebn@entreparentheses.xyz>
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
-{%- if  salt["pillar.get"]("qusal:dotfiles:all"), default=True) or
+{%- if  salt["pillar.get"]("qusal:dotfiles:all", default=True) or
         salt["pillar.get"]("qusal:dotfiles:dom0") or
         salt["pillar.get"]("qusal:dotfiles:git") or
         salt["pillar.get"]("qusal:dotfiles:gtk") or
