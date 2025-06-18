@@ -34,10 +34,12 @@ alias cp="cp -i"
 alias mv="mv -i"
 alias ls="ls -hF --group-directories-first --color=auto"
 if has lsblk; then
-  lsblk_options="NAME,FSTYPE,LABEL,SIZE,FSAVAIL,FSUSE%,MOUNTPOINT"
-  alias lsblk='lsblk -o ${lsblk_options}'
-  alias lsblku='lsblk -o ${lsblk_options},UUID,PARTUUID'
-  unset lsblk_options
+  _lsblk_options="NAME,FSTYPE,LABEL,SIZE,FSAVAIL,FSUSE%,MOUNTPOINT"
+  # shellcheck disable=SC2139
+  alias lsblk="lsblk -o ${_lsblk_options}"
+  # shellcheck disable=SC2139
+  alias lsblku="lsblk -o ${_lsblk_options},UUID,PARTUUID"
+  unset _lsblk_options
 fi
 if ! grep --color 2>&1 | grep -qE -e "(unrecognized|unknown) option" &&
   ! grep --exclude 2>&1 | grep -qE -e "(unrecognized|unknown) option"
