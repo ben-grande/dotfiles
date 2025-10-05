@@ -5,4 +5,5 @@
 ## Source all configurations
 cd ~/.config/mutt
 source mutt-sorcerer|
+cd
 ## vim: ft=muttrc
