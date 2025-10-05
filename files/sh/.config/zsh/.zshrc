@@ -155,7 +155,7 @@ zstyle ':completion:*' list-prompt \
 zstyle ':completion:*' list-suffixes true
 zstyle ':completion:*' matcher-list '' \
   'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' \
-  'r:|[._-]=** r:|=**' 'l:|=* r:|=*'
+  'r:|[-_.]=** r:|=**' 'l:|=* r:|=*'
 zstyle ':completion:*' menu select=1
 zstyle ':completion:*' original true
 zstyle ':completion:*' preserve-prefix '//[^/]##/'
@@ -163,7 +163,7 @@ zstyle ':completion:*' select-prompt \
   %SScrolling active: current selection at %p%s
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' squeeze-slashes true
-zstyle ':completion:*' use-compctl true
+zstyle ':completion:*' use-compctl false
 zstyle ':completion:*' verbose true
 zstyle ':completion:*:*:-command-:*:*' file-patterns \
   '*(#q-*):executables:Executables *(-/):directories:Directories'
@@ -211,7 +211,7 @@ fi
 autoload -Uz compinit
 zmodload zsh/complist
 mkdir -p -- "$XDG_CACHE_HOME/zsh"
-compinit -u -d "$XDG_CACHE_HOME/zsh/zcompdump"
+compinit -d "$XDG_CACHE_HOME/zsh/zcompdump"
 # _comp_options+=(globdots)
 ! has zoxide || eval "$(zoxide init zsh)"
 ! has gitlint || eval "$(_GITLINT_COMPLETE=zsh_source gitlint)"
