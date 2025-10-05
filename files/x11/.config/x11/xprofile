@@ -22,8 +22,9 @@ hostname="${HOSTNAME:-$(hostname)}"
 if ! command -v qubesdb-read >/dev/null || test "${hostname}" = "dom0" ||
   test -f /var/run/qubes-service/guivm
 then
-  ## Decrease key repeat delay to X ms.
-  ## Increase key repeat rate to Y per second.
+  # Switch off display after some idle seconds.
+  xset dpms 0 0 600
+  ## Decrease key repeat delay to X ms and increase key repeat rate to Y/s.
   xset r rate 275 60
 
   ## Give Caps Lock a better use.
@@ -88,9 +89,13 @@ if test -r "${HOME}/.xprofile.local"; then
   unset x11_profile
 fi
 
-: "${wm_list:="dwm"}"
+if command -v xsetroot >/dev/null; then
+  xsetroot -solid '#000000'
+fi
+
+: "${wm_list:="dwm i3 startplasma-x11 startfxce4"}"
 for wm in ${wm_list}; do
-  command -v "${wm}" >/dev/null || break
+  command -v "${wm}" >/dev/null || continue
   if test "${wm}" = "dwm" && command -v xsetroot >/dev/null; then
     desktop_autostart
     while true; do
@@ -103,6 +108,7 @@ for wm in ${wm_list}; do
   # shellcheck disable=SC2093
   ${wm} &
   wm_pid="${!}"
+  break
 done
 unset wm
 
