@@ -4,7 +4,7 @@
 " License:      MIT
 " Location:     plugin/cool.vim
 " Website:      https://github.com/romainl/vim-cool
-" SPDX-FileCopyrightText: 2023 romainl <romainlafourcade@gmail.com>
+" SPDX-FileCopyrightText: 2023 - 2025 romainl <romainlafourcade@gmail.com>
 " SPDX-License-Identifier: MIT
 
 if exists("g:loaded_cool") || v:version < 704 || &compatible
@@ -33,7 +33,12 @@ function! s:StartHL()
     endif
     let g:cool_is_searching = 1
     let [pos, rpos] = [winsaveview(), getpos('.')]
-    silent! exe "keepjumps go".(line2byte('.')+col('.')-(v:searchforward ? 2 : 0))
+    let byte = line2byte('.')+col('.')-(v:searchforward ? 2 : 0)
+
+    if byte <= 0
+      return
+    endif
+    silent! exe "keepjumps go".byte
     try
         silent keepjumps norm! n
         if getpos('.') != rpos
@@ -77,7 +82,7 @@ function! s:StartHL()
 endfunction
 
 function! s:StopHL()
-    if !v:hlsearch || mode() isnot 'n' || &buftype == 'terminal'
+    if !v:hlsearch || mode() isnot 'n'
         return
     else
         let g:cool_is_searching = 0
@@ -103,8 +108,13 @@ function! s:PlayItCool(old, new)
         noremap <silent> <Plug>(StopHL) :<C-U>nohlsearch<cr>
         if !exists('*execute')
             noremap! <expr> <Plug>(StopHL) <SID>AuNohlsearch()
+
+            " If no "execute()", ":tnoremap" isn't probably implemented too.
         else
             noremap! <expr> <Plug>(StopHL) execute('nohlsearch')[-1]
+            if exists(':tnoremap')
+                tnoremap <expr> <Plug>(StopHL) execute('nohlsearch')[-1]
+            endif
         endif
 
         autocmd Cool CursorMoved * call <SID>StartHL()
@@ -114,6 +124,9 @@ function! s:PlayItCool(old, new)
         "   tear down coolness
         nunmap <Plug>(StopHL)
         unmap! <expr> <Plug>(StopHL)
+        if exists(':tunmap')
+            tunmap <Plug>(StopHL)
+        endif
 
         autocmd! Cool CursorMoved
         autocmd! Cool InsertEnter
